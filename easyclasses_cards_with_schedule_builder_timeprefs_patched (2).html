@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>EasyClasses SJU • Spring 2026 Class Finder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Google Font: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Poppins', 'system-ui', 'sans-serif']
+          },
+          colors: {
+            brand: {
+              50: '#eef4ff',
+              100: '#e0ecff',
+              500: '#2563eb',
+              600: '#1d4ed8',
+              700: '#1e40af'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <style>
+    body { font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .chip-active {
+      background: #1d4ed8;
+      color: #f9fafb;
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.18);
+    }
+  </style>
+
+  <!-- PDF.js for advisement sheet reading -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  </script>
+
+</head>
+<body class="min-h-screen bg-gradient-to-b from-slate-50 via-slate-50 to-slate-100 text-slate-900">
+  <!-- Top Navbar -->
+  <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-14 md:h-16 flex items-center justify-between">
+      <!-- Left: Logo + Brand -->
+      <a href="?page=home" class="flex items-center gap-2 group">
+        <div class="h-8 w-8 rounded-xl overflow-hidden ring-1 ring-slate-700/70 shadow-sm">
+          <img
+            src="https://i.imgur.com/ZhBld9W.png"
+            alt="EasyClasses logo"
+            class="h-full w-full object-cover"
+          />
+        </div>
+        <div class="flex flex-col">
+          <span class="text-sm font-semibold tracking-tight text-slate-50 group-hover:text-sky-300 transition-colors">
+            EasyClasses SJU
+          </span>
+          <span class="text-[11px] text-slate-400">
+            Spring 2026 Tools
+          </span>
+        </div>
+      </a>
+
+      <!-- Center: Nav Links (desktop) -->
+      <nav class="hidden md:flex items-center gap-2 text-sm font-medium">
+        <a href="?page=home"
+           data-nav="home"
+           class="px-3 py-1.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+          Home
+        </a>
+        <a href="?page=course-search"
+           data-nav="course-search"
+           class="px-3 py-1.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+          Course Search
+        </a>
+        <a href="?page=schedule-builder"
+           data-nav="schedule-builder"
+           class="px-3 py-1.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+          Schedule Builder
+        </a>
+        <a href="?page=schedule-optimizer"
+           data-nav="schedule-optimizer"
+           class="px-3 py-1.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+          Schedule Optimizer
+        </a>
+      </nav>
+
+      <!-- Right: Theme toggle + Prototype pill (desktop) -->
+      <div class="hidden md:flex items-center gap-3">
+        <!-- Existing theme toggle button (moved into navbar) -->
+        <button
+          id="themeToggle"
+          type="button"
+          class="inline-flex items-center gap-1.5 rounded-full border border-slate-700/80 bg-slate-900/80 px-3 py-1.5 text-xs font-medium text-slate-100 hover:border-sky-400 hover:text-sky-100 transition-colors"
+        >
+          <span class="icon">
+            <i class="fa-solid fa-moon text-slate-300 text-[0.8rem]"></i>
+          </span>
+          <span class="label">Dark</span>
+        </button>
+
+        <span class="inline-flex items-center rounded-full bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-300 border border-amber-500/40">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-400 mr-1.5"></span>
+          Prototype
+        </span>
+      </div>
+
+      <!-- Mobile menu button -->
+      <button
+        type="button"
+        class="md:hidden inline-flex items-center justify-center p-2 rounded-full border border-slate-700/70 text-slate-100 hover:bg-white/10 focus:outline-none"
+        aria-label="Open navigation"
+        id="mobileNavToggle"
+      >
+        <i class="fa-solid fa-bars text-sm"></i>
+      </button>
+    </div>
+
+    <!-- Mobile Nav -->
+    <nav
+      id="mobileNav"
+      class="md:hidden hidden border-t border-slate-800/80 bg-slate-950/95 backdrop-blur"
+    >
+      <div class="max-w-6xl mx-auto px-4 py-2 flex flex-col gap-1 text-sm">
+        <a href="?page=home"
+           data-nav="home"
+           class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+          Home
+        </a>
+        <a href="?page=course-search"
+           data-nav="course-search"
+           class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+          Course Search
+        </a>
+        <a href="?page=schedule-builder"
+           data-nav="schedule-builder"
+           class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+          Schedule Builder
+        </a>
+        <a href="?page=schedule-optimizer"
+           data-nav="schedule-optimizer"
+           class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+          Schedule Optimizer
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- hidden utility swatches for Tailwind -->
+  <div class="hidden">
+    <span class="bg-emerald-50 text-emerald-700 border-emerald-100"></span>
+    <span class="bg-amber-50 text-amber-700 border-amber-100"></span>
+    <span class="bg-rose-50 text-rose-700 border-rose-100"></span>
+    <span class="bg-slate-100 text-slate-700 border-slate-200"></span>
+    <span class="bg-violet-50 text-violet-700 border-violet-100"></span>
+  </div>
+
+  <div class="max-w-6xl mx-auto px-4 py-8 md:py-10 space-y-8">
+
+  <!-- COURSE SEARCH PAGE PANEL -->
+  <section data-page-panel="course-search" class="space-y-4">
+    <!-- PAGE HEADER -->
+    <header class="mb-6">
+      <h1 class="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">
+        EasyClasses SJU • Spring 2026
+      </h1>
+      <p class="text-sm md:text-[0.9rem] text-slate-500 mt-1">
+        Browse sections, professor difficulty, and waitlist odds in a friendlier view than Banner.
+      </p>
+    </header>
+
+    <!-- SEARCH + FILTERS -->
+    <section class="bg-white/90 backdrop-blur rounded-3xl shadow-sm border border-slate-100 p-4 md:p-5 mb-5">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-6">
+        <div class="flex-1 space-y-3">
+          <label class="text-xs font-medium text-slate-500 block">Search</label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </span>
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="Search by course, CRN, or professor…"
+              class="w-full rounded-2xl border border-slate-200 bg-slate-50/80 py-2.5 pl-10 pr-3 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition"
+            />
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs font-medium text-slate-500 block mb-1">Subject</label>
+              <select
+                id="subjectFilter"
+                class="w-full rounded-2xl border border-slate-200 bg-slate-50/80 py-2.5 px-3 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition"
+              >
+                <option value="">All subjects</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs font-medium text-slate-500 block mb-1">Campus</label>
+              <select
+                id="campusFilter"
+                class="w-full rounded-2xl border border-slate-200 bg-slate-50/80 py-2.5 px-3 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition"
+              >
+                <option value="">All campuses</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- right filters -->
+        <div class="md:w-72 space-y-3">
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-medium text-slate-500">Difficulty</span>
+              <button id="clearDifficulty" class="text-[0.7rem] text-slate-400 hover:text-brand-600">
+                Reset
+              </button>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              <button data-diff="" class="difficulty-chip px-3 py-1.5 rounded-full text-xs border border-slate-200 bg-slate-50 text-slate-700">
+                Any
+              </button>
+              <button data-diff="Easy" class="difficulty-chip px-3 py-1.5 rounded-full text-xs border border-slate-200 bg-emerald-50 text-emerald-700">
+                Easy
+              </button>
+              <button data-diff="Moderate" class="difficulty-chip px-3 py-1.5 rounded-full text-xs border border-slate-200 bg-amber-50 text-amber-700">
+                Moderate
+              </button>
+              <button data-diff="Challenging" class="difficulty-chip px-3 py-1.5 rounded-full text-xs border border-slate-200 bg-violet-50 text-violet-700">
+                Challenging
+              </button>
+              <button data-diff="Demanding" class="difficulty-chip px-3 py-1.5 rounded-full text-xs border border-slate-200 bg-rose-50 text-rose-700">
+                Demanding
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/70 px-3 py-2.5">
+            <div>
+              <p class="text-xs font-medium text-slate-700">Good waitlist odds only</p>
+              <p class="text-[0.7rem] text-slate-400">Hide sections with low WL chance.</p>
+            </div>
+            <button
+              id="wlToggle"
+              class="relative inline-flex h-6 w-11 items-center rounded-full border border-slate-200 bg-white transition"
+            >
+              <span class="sr-only">Toggle good waitlist odds</span>
+              <span class="dot inline-block h-4 w-4 rounded-full bg-slate-300 transform transition translate-x-1"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATUS -->
+    <div class="flex items-center justify-between text-xs text-slate-500 mb-2">
+      <span id="statusText">Loading sections…</span>
+      <span class="hidden sm:inline text-[0.7rem]">Data source: Sheet2API (subjects & professor ratings).</span>
+    </div>
+
+    <!-- RESULTS -->
+    <section id="resultsContainer" class="space-y-3 mb-10"></section>
+  </section>
+
+  <!-- SCHEDULE BUILDER PAGE PANEL -->
+  <section data-page-panel="schedule-builder" class="space-y-5 hidden">
+
+    <header class="mb-3">
+      <h1 class="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">
+        Schedule Builder
+      </h1>
+      <p class="text-sm md:text-[0.9rem] text-slate-500 mt-1">
+        Upload your advisement sheet (PDF). We’ll scan the “Part 2” section and pull out the courses you need.
+      </p>
+    </header>
+
+    <div class="grid gap-5 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+      <!-- Left: upload + controls -->
+      <div class="bg-white/90 backdrop-blur rounded-3xl shadow-sm border border-slate-100 p-4 md:p-5 space-y-4">
+        <h2 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+          <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-sky-50 text-sky-600 text-xs">
+            <i class="fa-solid fa-file-pdf"></i>
+          </span>
+          Advisement sheet upload
+        </h2>
+        <p class="text-xs text-slate-500">
+          Use the official advisement form that lists your <span class="font-medium">Part 2: Desired Course Selection</span>.
+          We’ll only process the file in your browser.
+        </p>
+
+        <div class="border border-dashed border-slate-200 rounded-2xl bg-slate-50/70 px-4 py-5 space-y-3">
+          <label
+            for="builderPdfInput"
+            class="inline-flex items-center gap-2 rounded-full bg-slate-900 text-slate-50 px-4 py-2 text-xs font-medium shadow-sm cursor-pointer hover:bg-slate-800 transition"
+          >
+            <i class="fa-solid fa-upload text-[0.8rem]"></i>
+            <span>Choose PDF</span>
+          </label>
+          <input
+            id="builderPdfInput"
+            type="file"
+            accept="application/pdf"
+            class="sr-only"
+          />
+
+          <p id="builderFileName" class="text-[0.72rem] text-slate-500">
+            No file selected yet.
+          </p>
+
+          <button
+            id="builderRunBtn"
+            type="button"
+            disabled
+            class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-medium text-slate-700 hover:border-sky-400 hover:text-sky-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          >
+            <i class="fa-solid fa-wand-magic-sparkles text-[0.8rem]"></i>
+            <span>Extract courses</span>
+          </button>
+
+          <p class="text-[0.7rem] text-slate-400">
+            Tip: If nothing shows up, make sure your PDF actually contains a
+            “Part 2: Desired Course Selection” section.
+          </p>
+        </div>
+      </div>
+
+      <!-- Right: extracted courses -->
+      <div class="bg-white/90 backdrop-blur rounded-3xl shadow-sm border border-slate-100 p-4 md:p-5 flex flex-col">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 text-xs">
+              <i class="fa-solid fa-list-check"></i>
+            </span>
+            Detected courses
+          </h2>
+          <span
+            id="builderCountBadge"
+            class="hidden rounded-full bg-slate-100 text-slate-700 border border-slate-200 text-[0.7rem] px-2 py-0.5"
+          ></span>
+        </div>
+
+        <ul
+          id="builderCourseList"
+          class="flex-1 space-y-1.5 text-sm text-slate-800 overflow-auto"
+        >
+          <li class="text-xs text-slate-400">
+            Upload a PDF and click <span class="font-semibold">“Extract courses”</span> to see your list here.
+          </li>
+        </ul>
+
+        <details class="mt-4 text-xs text-slate-500">
+          <summary class="cursor-pointer text-[0.7rem] text-slate-400">
+            Show raw “Part 2” text (debug)
+          </summary>
+          <pre
+            id="builderSectionDebug"
+            class="mt-2 max-h-48 overflow-auto rounded-2xl bg-slate-950/90 text-[0.7rem] text-slate-100 p-3 whitespace-pre-wrap"
+          ></pre>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIME PREFERENCES PANEL -->
+  <section data-page-panel="schedule-builder" class="space-y-4">
+    <div class="bg-white/90 backdrop-blur rounded-3xl shadow-sm border border-slate-100 p-4 md:p-5">
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,2.2fr)]">
+        <!-- Left: controls -->
+        <div class="space-y-4">
+          <div>
+            <h2 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+              <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-sky-50 text-sky-600 text-xs">
+                <i class="fa-solid fa-clock"></i>
+              </span>
+              When do you want classes?
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">
+              Choose the days and time window you’d like to have class. You can override specific days if they follow a different schedule.
+            </p>
+          </div>
+
+          <!-- Days of week -->
+          <div class="space-y-2">
+            <span class="text-[0.7rem] font-medium text-slate-500 uppercase tracking-wide">Days of the week</span>
+            <div class="flex flex-wrap gap-1.5">
+              <button type="button" class="time-day-pill px-3 py-1.5 rounded-full text-xs border border-slate-200 bg-slate-50 text-slate-700" data-day-key="Mon">M</button>
+              <button type="button" class="time-day-pill px-3 py-1.5 rounded-full text-xs border border-slate-200 bg-slate-50 text-slate-700" data-day-key="Tue">Tu</button>
+              <button type="button" class="time-day-pill px-3 py-1.5 rounded-full text-xs border border-slate-200 bg-slate-50 text-slate-700" data-day-key="Wed">W</button>
+              <button type="button" class="time-day-pill px-3 py-1.5 rounded-full text-xs border border-slate-200 bg-slate-50 text-slate-700" data-day-key="Thu">Th</button>
+              <button type="button" class="time-day-pill px-3 py-1.5 rounded-full text-xs border border-slate-200 bg-slate-50 text-slate-700" data-day-key="Fri">F</button>
+            </div>
+          </div>
+
+          <!-- Default window -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[0.7rem] font-medium text-slate-500 uppercase tracking-wide">Default time window</span>
+              <span class="text-[0.7rem] text-slate-400">Applied to all selected days</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <label class="flex items-center gap-1.5">
+                <span class="text-slate-500">From</span>
+                <select id="timeDefaultFrom" class="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-xs focus:border-brand-500 focus:ring-1 focus:ring-brand-100 outline-none">
+                </select>
+              </label>
+              <label class="flex items-center gap-1.5">
+                <span class="text-slate-500">To</span>
+                <select id="timeDefaultTo" class="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-xs focus:border-brand-500 focus:ring-1 focus:ring-brand-100 outline-none">
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <!-- Custom per-day -->
+          <div class="space-y-2">
+            <span class="text-[0.7rem] font-medium text-slate-500 uppercase tracking-wide">Custom windows per day (optional)</span>
+            <div class="space-y-2.5 text-xs">
+              
+              <div class="flex items-center justify-between gap-2" data-time-row="Mon">
+                <div class="flex items-center gap-2">
+                  <label class="inline-flex items-center gap-1.5">
+                    <input type="checkbox" class="time-custom-toggle h-3.5 w-3.5 rounded border-slate-300 text-brand-500" data-time-custom-toggle="Mon">
+                    <span class="text-slate-700">Monday</span>
+                  </label>
+                  <span class="text-[0.68rem] text-slate-400 hidden sm:inline">Use custom window for this day</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <select data-time-custom-from="Mon" class="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-[0.7rem] focus:border-brand-500 focus:ring-1 focus:ring-brand-100 outline-none" disabled></select>
+                  <span class="text-[0.7rem] text-slate-400">to</span>
+                  <select data-time-custom-to="Mon" class="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-[0.7rem] focus:border-brand-500 focus:ring-1 focus:ring-brand-100 outline-none" disabled></select>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between gap-2" data-time-row="Tue">
+                <div class="flex items-center gap-2">
+                  <label class="inline-flex items-center gap-1.5">
+                    <input type="checkbox" class="time-custom-toggle h-3.5 w-3.5 rounded border-slate-300 text-brand-500" data-time-custom-toggle="Tue">
+                    <span class="text-slate-700">Tuesday</span>
+                  </label>
+                  <span class="text-[0.68rem] text-slate-400 hidden sm:inline">Use custom window for this day</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <select data-time-custom-from="Tue" class="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-[0.7rem] focus:border-brand-500 focus:ring-1 focus:ring-brand-100 outline-none" disabled></select>
+                  <span class="text-[0.7rem] text-slate-400">to</span>
+                  <select data-time-custom-to="Tue" class="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-[0.7rem] focus:border-brand-500 focus:ring-1 focus:ring-brand-100 outline-none" disabled></select>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between gap-2" data-time-row="Wed">
+                <div class="flex items-center gap-2">
+                  <label class="inline-flex items-center gap-1.5">
+                    <input type="checkbox" class="time-custom-toggle h-3.5 w-3.5 rounded border-slate-300 text-brand-500" data-time-custom-toggle="Wed">
+                    <span class="text-slate-700">Wednesday</span>
+                  </label>
+                  <span class="text-[0.68rem] text-slate-400 hidden sm:inline">Use custom window for this day</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <select data-time-custom-from="Wed" class="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-[0.7rem] focus:border-brand-500 focus:ring-1 focus:ring-brand-100 outline-none" disabled></select>
+                  <span class="text-[0.7rem] text-slate-400">to</span>
+                  <select data-time-custom-to="Wed" class="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-[0.7rem] focus:border-brand-500 focus:ring-1 focus:ring-brand-100 outline-none" disabled></select>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between gap-2" data-time-row="Thu">
+                <div class="flex items-center gap-2">
+                  <label class="inline-flex items-center gap-1.5">
+                    <input type="checkbox" class="time-custom-toggle h-3.5 w-3.5 rounded border-slate-300 text-brand-500" data-time-custom-toggle="Thu">
+                    <span class="text-slate-700">Thursday</span>
+                  </label>
+                  <span class="text-[0.68rem] text-slate-400 hidden sm:inline">Use custom window for this day</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <select data-time-custom-from="Thu" class="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-[0.7rem] focus:border-brand-500 focus:ring-1 focus:ring-brand-100 outline-none" disabled></select>
+                  <span class="text-[0.7rem] text-slate-400">to</span>
+                  <select data-time-custom-to="Thu" class="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-[0.7rem] focus:border-brand-500 focus:ring-1 focus:ring-brand-100 outline-none" disabled></select>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between gap-2" data-time-row="Fri">
+                <div class="flex items-center gap-2">
+                  <label class="inline-flex items-center gap-1.5">
+                    <input type="checkbox" class="time-custom-toggle h-3.5 w-3.5 rounded border-slate-300 text-brand-500" data-time-custom-toggle="Fri">
+                    <span class="text-slate-700">Friday</span>
+                  </label>
+                  <span class="text-[0.68rem] text-slate-400 hidden sm:inline">Use custom window for this day</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <select data-time-custom-from="Fri" class="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-[0.7rem] focus:border-brand-500 focus:ring-1 focus:ring-brand-100 outline-none" disabled></select>
+                  <span class="text-[0.7rem] text-slate-400">to</span>
+                  <select data-time-custom-to="Fri" class="rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-[0.7rem] focus:border-brand-500 focus:ring-1 focus:ring-brand-100 outline-none" disabled></select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p id="timeSummaryText" class="text-[0.7rem] text-slate-500 mt-2">
+            Select at least one day and a time range.
+          </p>
+        </div>
+
+        <!-- Right: weekly grid -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-semibold text-slate-700">Weekly view</span>
+            <span class="inline-flex items-center gap-1 rounded-full bg-sky-50 text-sky-700 border border-sky-100 px-2 py-0.5 text-[0.7rem]">
+              <span class="inline-block h-2 w-2 rounded-sm bg-sky-500"></span>
+              <span>Preferred class times</span>
+            </span>
+          </div>
+          <div class="rounded-3xl border border-slate-100 bg-slate-50/80 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="min-w-full border-collapse text-[0.7rem] text-slate-500">
+                <thead class="bg-slate-100/70">
+                  <tr>
+                    <th class="px-2 py-2 text-left font-medium border-b border-slate-100 w-16">Time</th>
+                    <th class="px-2 py-2 text-center font-medium border-b border-slate-100">Mon</th>
+                    <th class="px-2 py-2 text-center font-medium border-b border-slate-100">Tue</th>
+                    <th class="px-2 py-2 text-center font-medium border-b border-slate-100">Wed</th>
+                    <th class="px-2 py-2 text-center font-medium border-b border-slate-100">Thu</th>
+                    <th class="px-2 py-2 text-center font-medium border-b border-slate-100">Fri</th>
+                  </tr>
+                </thead>
+                <tbody id="timeGridBody">
+                  <!-- Rows injected by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+  <script>
+    const SUBJECTS_API = "https://sheet2api.com/v1/ZPeTNTUrSFuL/all_subjects_spring_2026";
+    const PROFS_API    = "https://sheet2api.com/v1/ZPeTNTUrSFuL/professor_ratings";
+
+    const searchInput     = document.getElementById("searchInput");
+    const subjectFilter   = document.getElementById("subjectFilter");
+    const campusFilter    = document.getElementById("campusFilter");
+    const difficultyChips = Array.from(document.querySelectorAll(".difficulty-chip"));
+    const wlToggle        = document.getElementById("wlToggle");
+    const statusText      = document.getElementById("statusText");
+    const resultsContainer= document.getElementById("resultsContainer");
+    const themeToggle     = document.getElementById("themeToggle");
+    const clearDifficultyBtn = document.getElementById("clearDifficulty");
+
+    // SPA-style navigation with deep links (no full page reloads)
+    function setActivePage(page) {
+      // nav links (desktop + mobile)
+      document.querySelectorAll("[data-nav]").forEach(link => {
+        const linkPage = link.getAttribute("data-nav");
+        const isActive = linkPage === page;
+        link.classList.toggle("bg-sky-500/90", isActive);
+        link.classList.toggle("text-white", isActive);
+        if (link.tagName === "A") {
+          link.classList.toggle("text-slate-300", !isActive);
+        }
+      });
+
+      // show the correct page panel(s)
+      const pagePanels = document.querySelectorAll("[data-page-panel]");
+      pagePanels.forEach((panel) => {
+        const name = panel.getAttribute("data-page-panel");
+        const isActive = name === page;
+        panel.classList.toggle("hidden", !isActive);
+      });
+    }
+
+    // Initial page from URL (?page=...)
+    const navParams = new URLSearchParams(window.location.search);
+    const rawInitialPage = navParams.get("page") || "course-search";
+    const initialPage = rawInitialPage === "home" ? "course-search" : rawInitialPage;
+    setActivePage(initialPage);
+
+    // Intercept nav clicks to avoid full reloads
+    document.querySelectorAll("[data-nav]").forEach(link => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        const pageAttr = link.getAttribute("data-nav");
+        const page = pageAttr === "home" ? "course-search" : pageAttr;
+        if (!page) return;
+
+        const url = new URL(window.location);
+        url.searchParams.set("page", pageAttr);
+        window.history.pushState({ page }, "", url);
+
+        setActivePage(page);
+
+        // if mobile nav is open, close it
+        if (typeof mobileNav !== "undefined" && mobileNav && !mobileNav.classList.contains("hidden")) {
+          mobileNav.classList.add("hidden");
+        }
+      });
+    });
+
+    // Handle browser back/forward navigation
+    window.addEventListener("popstate", (event) => {
+      const statePage = event.state && event.state.page;
+      const params = new URLSearchParams(window.location.search);
+      const rawPage = statePage || params.get("page") || "course-search";
+      const page = rawPage === "home" ? "course-search" : rawPage;
+      setActivePage(page);
+    });
+
+    const mobileNavToggle = document.getElementById("mobileNavToggle");
+    const mobileNav = document.getElementById("mobileNav");
+    if (mobileNavToggle && mobileNav) {
+      mobileNavToggle.addEventListener("click", () => {
+        mobileNav.classList.toggle("hidden");
+      });
+    }
+
+
+    let activeDifficulty = "";
+    let goodWlOnly       = false;
+    let sections         = [];
+    let dataLoaded       = false;
+
+    // Add/drop deadline + WL model
+    const ADD_DROP_DEADLINE       = new Date("2026-01-27T23:59:59-05:00");
+    const P_DROP_PER_SEAT_PER_DAY = 0.004;
+
+    function getDaysRemaining() {
+      const now = new Date();
+      const msPerDay = 1000 * 60 * 60 * 24;
+      const diff = (ADD_DROP_DEADLINE - now) / msPerDay;
+      return Math.max(0, Math.floor(diff));
+    }
+
+    // Theme toggle
+    themeToggle.addEventListener("click", () => {
+      const body  = document.body;
+      const icon  = themeToggle.querySelector(".icon i");
+      const label = themeToggle.querySelector(".label");
+      const isDark = body.classList.toggle("bg-slate-900");
+      body.classList.toggle("text-slate-50", isDark);
+      body.classList.toggle("text-slate-900", !isDark);
+      body.classList.toggle("bg-gradient-to-b", !isDark);
+      if (isDark) {
+        themeToggle.classList.add("bg-slate-800", "border-slate-700", "text-slate-100");
+        icon.classList.remove("fa-moon");
+        icon.classList.add("fa-sun", "text-amber-300");
+        label.textContent = "Light";
+      } else {
+        themeToggle.classList.remove("bg-slate-800", "border-slate-700", "text-slate-100");
+        icon.classList.remove("fa-sun", "text-amber-300");
+        icon.classList.add("fa-moon", "text-slate-500");
+        label.textContent = "Dark";
+      }
+    });
+
+    // helpers
+    function titleCase(str) {
+      if (!str) return "";
+      return str
+        .toLowerCase()
+        .split(/\s+/)
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+    }
+
+    // Meeting times → structured chunks
+    function parseMeetingTimes(meetingStr) {
+      if (!meetingStr || typeof meetingStr !== "string") return [];
+      const entries = [];
+      const chunks = meetingStr.split("Start Date:").filter(Boolean);
+      const pattern = /^(?<days>.*?)SMTWTFS\s*(?<time>.*?)(?:Type:\s*(?<type>.*?))?Building:\s*(?<building>.*?)\s*Room:\s*(?<room>.*)$/i;
+      for (const rawChunk of chunks) {
+        const chunk = rawChunk.trim();
+        if (!chunk) continue;
+        const match = chunk.match(pattern);
+        if (!match || !match.groups) continue;
+        const { days, time, type, building, room } = match.groups;
+        entries.push({
+          rawDays: (days || "").trim(),
+          time:    (time || "").trim(),
+          type:    (type || "").trim(),
+          building:(building || "").trim(),
+          room:    (room || "").trim()
+        });
+      }
+      return entries;
+    }
+
+    // Status → seats + WL
+    function parseStatus(raw) {
+      const result = {
+        seatsRem: null, seatsTot: null,
+        wlRem: null, wlTot: null,
+        isFull: false, reservedForWaitlist: false
+      };
+      if (!raw) return result;
+      const upper = raw.toUpperCase();
+      if (upper.includes("FULL")) result.isFull = true;
+      if (upper.includes("OPEN SEATS RESERVED FOR WAITLISTED")) result.reservedForWaitlist = true;
+      const seatMatch = raw.match(/(\d+)\s+of\s+(\d+)\s+seats\s+remain/i);
+      if (seatMatch) {
+        result.seatsRem = parseInt(seatMatch[1], 10);
+        result.seatsTot = parseInt(seatMatch[2], 10);
+      }
+      const wlMatch = raw.match(/(\d+)\s+of\s+(\d+)\s+waitlist\s+seats\s+remain/i);
+      if (wlMatch) {
+        result.wlRem = parseInt(wlMatch[1], 10);
+        result.wlTot = parseInt(wlMatch[2], 10);
+      }
+      return result;
+    }
+
+    // RMP difficulty → bucket + %
+    function difficultyFromAvg(avgDiff, numRatings) {
+      if (!avgDiff || avgDiff <= 0 || !numRatings || numRatings < 3) {
+        return { label: "Limited data", percent: null };
+      }
+      const norm = (avgDiff - 1) / 4; // 0 → easy, 1 → demanding
+      const pct  = Math.round(norm * 100);
+      let label;
+      if (norm < 0.25)      label = "Easy";
+      else if (norm < 0.5)  label = "Moderate";
+      else if (norm < 0.75) label = "Challenging";
+      else                  label = "Demanding";
+      return { label, percent: pct };
+    }
+
+    // Poisson tail P(X >= k)
+    function poissonTail(k, lambda) {
+      if (lambda <= 0) return 0;
+      let term  = Math.exp(-lambda);
+      let accum = term; // i = 0
+      for (let i = 1; i < k; i++) {
+        term *= lambda / i;
+        accum += term;
+      }
+      return 1 - accum;
+    }
+
+    // Delivery mode classification
+    function getDeliveryModeFromMeetings(meetings, campus) {
+      const campusLower   = (campus || "").toLowerCase();
+      const isOnlineCampus= campusLower.includes("online learning") || campusLower.includes("online");
+
+      let hasPhysical   = false;
+      let hasOnlineSync = false;
+      let hasOnlineAsync= false;
+
+      meetings.forEach(m => {
+        const days      = (m.rawDays || "").trim();
+        const time      = (m.time || "").trim();
+        const roomUpper = (m.room || "").toUpperCase();
+        const isOnlineRoom =
+          roomUpper.includes("ON-LINE") ||
+          roomUpper.includes("ONLINE") ||
+          roomUpper.includes("WEB") ||
+          roomUpper.includes("VIRTUAL");
+
+        const hasRealDays = days && days.toLowerCase() !== "none";
+        const hasRealTime = time && time !== "-";
+
+        if (!isOnlineRoom && hasRealDays && hasRealTime) {
+          hasPhysical = true;
+        }
+        if (isOnlineRoom && hasRealDays && hasRealTime) {
+          hasOnlineSync = true;
+        }
+        if (isOnlineRoom &&
+            (!hasRealDays || days.toLowerCase() === "none") &&
+            (!hasRealTime || time === "-")) {
+          hasOnlineAsync = true;
+        }
+      });
+
+      if (isOnlineCampus) {
+        if (hasOnlineSync) return { code: "online_sync", label: "Online • Sync" };
+        return { code: "online_async", label: "Online • Async" };
+      }
+
+      // Physical campus
+      if (hasPhysical && hasOnlineSync) {
+        return { code: "hybrid_inperson_sync", label: "Hybrid • In-person + Sync" };
+      }
+      if (hasPhysical && hasOnlineAsync) {
+        return { code: "hybrid_inperson_async", label: "Hybrid • In-person + Async" };
+      }
+      if (hasPhysical && !hasOnlineSync && !hasOnlineAsync) {
+        return { code: "in_person", label: "In-person" };
+      }
+
+      // fallback (only online segments but non-online campus)
+      if (!hasPhysical && (hasOnlineSync || hasOnlineAsync)) {
+        return hasOnlineSync
+          ? { code: "online_sync", label: "Online • Sync" }
+          : { code: "online_async", label: "Online • Async" };
+      }
+
+      return { code: "unknown", label: "" };
+    }
+
+    // Real-ish WL model
+    function estimateRealWaitlistChance(seatsRem, seatsTot, wlRem, wlTot) {
+      if (!wlTot || wlTot <= 0 || wlRem === null || wlRem === undefined) return null;
+      if (wlRem <= 0) return { label: "Low", percent: 0 };
+
+      const taken = wlTot - wlRem;
+      const k = taken + 1;
+      const daysRemaining = getDaysRemaining();
+
+      const enrolledNow =
+        seatsTot != null && seatsRem != null
+          ? Math.max(0, seatsTot - seatsRem)
+          : 0;
+
+      let lambda = enrolledNow * P_DROP_PER_SEAT_PER_DAY * daysRemaining;
+      if (seatsRem && seatsRem > 0) lambda += seatsRem;
+
+      if (lambda <= 0) return { label: "Low", percent: 0 };
+
+      let p = poissonTail(k, lambda);
+      p = Math.max(0, Math.min(0.99, p));
+
+      let label;
+      if (p >= 0.85)      label = "Very High";
+      else if (p >= 0.65) label = "High";
+      else if (p >= 0.35) label = "Moderate";
+      else                label = "Low";
+
+      return { label, percent: Math.round(p * 100) };
+    }
+
+    function getDifficultyBadgeClasses(label) {
+      switch (label) {
+        case "Easy":        return "bg-emerald-50 text-emerald-700 border border-emerald-100";
+        case "Moderate":    return "bg-amber-50 text-amber-700 border border-amber-100";
+        case "Challenging": return "bg-violet-50 text-violet-700 border border-violet-100";
+        case "Demanding":   return "bg-rose-50 text-rose-700 border border-rose-100";
+        default:            return "bg-slate-100 text-slate-700 border border-slate-200";
+      }
+    }
+
+    function getWaitlistBadgeClasses(label) {
+      switch (label) {
+        case "Very High": return "bg-emerald-100 text-emerald-800 border border-emerald-200";
+        case "High":      return "bg-emerald-50 text-emerald-700 border border-emerald-100";
+        case "Moderate":  return "bg-amber-50 text-amber-700 border border-amber-100";
+        case "Low":       return "bg-rose-50 text-rose-700 border border-rose-100";
+        default:          return "bg-slate-100 text-slate-700 border border-slate-200";
+      }
+    }
+
+    function getWaitlistTooltip(label) {
+      switch (label) {
+        case "Very High":
+          return "Very likely you’ll get in if you join now, but not guaranteed. Odds are strongly in your favor.";
+        case "High":
+          return "Good odds you’ll get in, though it’s not guaranteed. You’ve got a strong shot here.";
+        case "Moderate":
+          return "Could go either way. Hope for the best and keep a backup in mind.";
+        case "Low":
+          return "Unlikely you’ll get in from the waitlist. Don’t sweat it—treat it as a bonus if it works out.";
+        default:
+          return "Estimated waitlist odds based on seats, waitlist, and time until add/drop.";
+      }
+    }
+
+    // Build section object
+    function buildSectionObject(row, profMap) {
+      const subjectDesc   = row["Subject Description"] || "";
+      const courseNumber  = row["Course Number"] ?? "";
+      const crn           = row["CRN"];
+      const title         = row["Title"] || "";
+      const instructorRaw = (row["Instructor"] || "").trim();
+      const campus        = row["Campus"] || "";
+      const scheduleType  = row["Schedule Type"] || "";
+      const statusRaw     = row["Status"] || "";
+
+      const prof = profMap[instructorRaw] || null;
+
+      const meetings = parseMeetingTimes(row["Meeting Times"]);
+      let primaryMeeting = null;
+      if (meetings.length) {
+        primaryMeeting =
+          meetings.find(m => m.rawDays && m.rawDays.toLowerCase() !== "none") ||
+          meetings[0];
+      }
+
+      const meetingDays = primaryMeeting ? (primaryMeeting.rawDays || "TBA") : "TBA";
+      const meetingTime = primaryMeeting ? (primaryMeeting.time   || "")    : "";
+
+      const status = parseStatus(statusRaw);
+
+      // Location details (building/room or Online)
+      let building = primaryMeeting ? primaryMeeting.building : "";
+      let room     = primaryMeeting ? primaryMeeting.room     : "";
+      const upperRoom = (room || "").toUpperCase();
+      const onlineKeywords = ["ON-LINE", "ONLINE", "WEB", "VIRTUAL"];
+      let locationDetail = "";
+      if (building && room && !onlineKeywords.includes(upperRoom)) {
+        locationDetail = `${titleCase(building)} ${room}`;
+      } else if (onlineKeywords.includes(upperRoom)) {
+        locationDetail = "Online";
+      }
+
+      // Instructor display
+      let instructorDisplay = instructorRaw;
+      if (prof && prof.cleaned_name) {
+        instructorDisplay = prof.cleaned_name;
+      } else {
+        instructorDisplay = instructorDisplay.replace("(Primary)", "").trim();
+      }
+
+      // RMP stats
+      let avgRating      = null;
+      let numRatings     = null;
+      let avgDifficulty  = null;
+      let wouldTakeAgain = null;
+      let profileUrl     = null;
+      let difficultyInfo = { label: "No data", percent: null };
+
+      if (prof) {
+        avgRating      = prof.avg_rating || null;
+        numRatings     = prof.num_ratings || null;
+        avgDifficulty  = prof.avg_difficulty || null;
+        wouldTakeAgain = prof.would_take_again_percent || null;
+        profileUrl     = prof.profile_url || null;
+        difficultyInfo = difficultyFromAvg(avgDifficulty, numRatings);
+      }
+
+      // Waitlist logic only when seats full AND WL exists
+      const hasWaitlist = status.wlTot && status.wlTot > 0;
+      const seatsAreFull =
+        (status.seatsRem !== null && status.seatsRem <= 0) || status.isFull;
+
+      const wlChance = hasWaitlist && seatsAreFull
+        ? estimateRealWaitlistChance(status.seatsRem, status.seatsTot, status.wlRem, status.wlTot)
+        : null;
+
+      // Delivery mode
+      const delivery = getDeliveryModeFromMeetings(meetings, campus);
+
+      return {
+        crn,
+        title,
+        subjectDesc,
+        courseNumber,
+        instructorDisplay,
+        campus,
+        meetingDays,
+        meetingTime,
+        scheduleType,
+        statusRaw,
+        seatsRem: status.seatsRem,
+        seatsTot: status.seatsTot,
+        wlRem:    status.wlRem,
+        wlTot:    status.wlTot,
+        isFull:   status.isFull,
+        wlChance,
+        avgRating,
+        numRatings,
+        avgDifficulty,
+        wouldTakeAgain,
+        profileUrl,
+        difficultyLabel:  difficultyInfo.label,
+        difficultyPercent:difficultyInfo.percent,
+        reservedForWaitlist: status.reservedForWaitlist,
+        locationDetail,
+        deliveryCode:  delivery.code,
+        deliveryLabel: delivery.label
+      };
+    }
+
+    // Load data
+    async function loadData() {
+      if (dataLoaded) return;
+      try {
+        statusText.textContent = "Loading sections from APIs…";
+
+        const [subjectsRes, profRes] = await Promise.all([
+          fetch(SUBJECTS_API),
+          fetch(PROFS_API)
+        ]);
+        if (!subjectsRes.ok || !profRes.ok) throw new Error("API error");
+
+        const subjectsJson = await subjectsRes.json();
+        const profJson     = await profRes.json();
+
+        const profMap = {};
+        (profJson || []).forEach(p => {
+          if (p && p.raw_name) {
+            profMap[p.raw_name.trim()] = p;
+          }
+        });
+
+        sections = (subjectsJson || []).map(row => buildSectionObject(row, profMap));
+
+        // sort
+        sections.sort((a, b) => {
+          const sA = a.subjectDesc.localeCompare(b.subjectDesc);
+          if (sA !== 0) return sA;
+          const numA = parseInt(a.courseNumber || 0, 10);
+          const numB = parseInt(b.courseNumber || 0, 10);
+          if (numA !== numB) return numA - numB;
+          return String(a.crn || "").localeCompare(String(b.crn || ""));
+        });
+
+        dataLoaded = true;
+        populateFilters();
+        render();
+      } catch (err) {
+        console.error(err);
+        statusText.textContent = "Error loading data. Please refresh.";
+      }
+    }
+
+    function populateFilters() {
+      const subjects = new Set();
+      const campuses = new Set();
+      sections.forEach(s => {
+        if (s.subjectDesc) subjects.add(s.subjectDesc);
+        if (s.campus)      campuses.add(s.campus);
+      });
+      subjectFilter.innerHTML =
+        '<option value="">All subjects</option>' +
+        Array.from(subjects).sort().map(sub => `<option value="${sub}">${sub}</option>`).join("");
+      campusFilter.innerHTML =
+        '<option value="">All campuses</option>' +
+        Array.from(campuses).sort().map(c => `<option value="${c}">${c}</option>`).join("");
+    }
+
+    function getFilteredSections() {
+      const q      = (searchInput.value || "").toLowerCase().trim();
+      const subj   = subjectFilter.value;
+      const campus = campusFilter.value;
+
+      return sections.filter(s => {
+        if (subj && s.subjectDesc !== subj) return false;
+        if (campus && s.campus !== campus) return false;
+
+        if (activeDifficulty && s.difficultyLabel !== activeDifficulty) return false;
+
+        if (goodWlOnly) {
+          if (!s.wlChance || (s.wlChance.label !== "High" && s.wlChance.label !== "Very High")) {
+            return false;
+          }
+        }
+
+        if (q) {
+          const haystack = [
+            s.title,
+            s.subjectDesc,
+            String(s.courseNumber || ""),
+            String(s.crn || ""),
+            s.instructorDisplay
+          ].join(" ").toLowerCase();
+          if (!haystack.includes(q)) return false;
+        }
+        return true;
+      });
+    }
+
+    
+    function render() {
+      const filtered = getFilteredSections();
+      statusText.textContent = filtered.length
+        ? `${filtered.length.toLocaleString()} of ${sections.length.toLocaleString()} sections shown`
+        : "No sections match your filters right now.";
+
+      resultsContainer.innerHTML = "";
+      if (!filtered.length) return;
+
+      filtered.forEach((s) => {
+        const diffClasses = getDifficultyBadgeClasses(s.difficultyLabel);
+        const wlLabel   = s.wlChance ? s.wlChance.label   : null;
+        const wlPercent = s.wlChance ? s.wlChance.percent : null;
+        const wlClasses = wlLabel ? getWaitlistBadgeClasses(wlLabel) : "";
+        const wlTooltip = wlLabel ? getWaitlistTooltip(wlLabel)      : "";
+
+        // Only show waitlist info when seats are full AND a waitlist exists
+        const showWaitlist =
+          ((s.seatsRem !== null && s.seatsRem <= 0) || s.isFull) &&
+          s.wlTot != null && s.wlTot > 0;
+
+        // Seat status label + color
+        let seatStatusLabel = "";
+        if (s.seatsTot === 0 && s.isFull) {
+          seatStatusLabel = "Closed";
+        } else if (s.seatsRem !== null) {
+          seatStatusLabel =
+            s.seatsRem <= 0 || s.isFull
+              ? "Full"
+              : s.seatsRem <= Math.max(1, Math.round((s.seatsTot || 1) * 0.1))
+                ? "Almost full"
+                : "Open";
+        }
+
+        const seatStatusColor =
+          seatStatusLabel === "Open"
+            ? "text-emerald-700 bg-emerald-50 border border-emerald-100"
+            : seatStatusLabel === "Almost full"
+            ? "text-amber-700 bg-amber-50 border border-amber-100"
+            : seatStatusLabel === "Full"
+            ? "text-rose-700 bg-rose-50 border border-rose-100"
+            : "text-slate-600 bg-slate-50 border border-slate-200";
+
+        const ratingText =
+          s.avgRating != null && s.numRatings > 0
+            ? `${s.avgRating.toFixed(1)} · ${s.avgDifficulty != null ? s.avgDifficulty.toFixed(1) + " diff · " : ""}${s.numRatings} ratings`
+            : "No RMP data yet";
+
+        const takeAgainText =
+          s.wouldTakeAgain != null && s.wouldTakeAgain !== "" && s.wouldTakeAgain >= 0
+            ? `${Math.round(s.wouldTakeAgain)}% would take again`
+            : "";
+
+        const rmpLink = s.profileUrl
+          ? `<a href="${s.profileUrl}" target="_blank" rel="noopener"
+                class="inline-flex items-center gap-1 text-[0.72rem] text-brand-600 hover:text-brand-700">
+                View on RMP <i class="fa-solid fa-arrow-up-right-from-square text-[0.65rem]"></i>
+             </a>`
+          : "";
+
+        let seatsText;
+        if (s.seatsTot === 0 && s.isFull) {
+          seatsText = "Seats: not open";
+        } else if (s.seatsRem == null || s.seatsTot == null) {
+          seatsText = "Seats: n/a";
+        } else {
+          seatsText = `Seats: ${s.seatsTot - s.seatsRem}/${s.seatsTot} filled`;
+        }
+
+        const wlText = showWaitlist
+          ? `Waitlist: ${s.wlTot - s.wlRem}/${s.wlTot} taken`
+          : "";
+
+        const locationParts = [];
+        if (s.campus)         locationParts.push(s.campus);
+        if (s.locationDetail) locationParts.push(s.locationDetail);
+        const locationDisplay = locationParts.join(" • ");
+
+        const deliveryPill = s.deliveryLabel
+          ? `<span class="inline-flex items-center gap-1 rounded-full bg-slate-50 text-slate-700 border border-slate-200 px-2.5 py-0.5 text-[0.7rem]">
+               <i class="fa-solid fa-laptop text-[0.7rem] text-slate-500"></i>
+               <span>${s.deliveryLabel}</span>
+             </span>`
+          : "";
+
+        const wlPill = (showWaitlist && wlLabel)
+          ? `<span class="${wlClasses} inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[0.7rem] font-medium" title="${wlTooltip}">
+               <i class="fa-solid fa-ticket text-[0.7rem]"></i>
+               <span>${wlLabel}${wlPercent != null ? ` · ${Math.round(wlPercent)}%` : ""}</span>
+             </span>`
+          : "";
+
+        const diffText =
+          s.difficultyPercent != null
+            ? `${s.difficultyLabel} · ${Math.round(s.difficultyPercent)}%`
+            : s.difficultyLabel;
+
+        const diffPill =
+          `<span class="${diffClasses} inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[0.7rem] font-medium">
+             <i class="fa-solid fa-gauge text-[0.7rem]"></i>
+             <span>${diffText}</span>
+           </span>`;
+
+        const seatStatusPill = seatStatusLabel
+          ? `<span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[0.7rem] font-medium ${seatStatusColor}">
+               <i class="fa-solid fa-circle text-[0.5rem]"></i>
+               <span>${seatStatusLabel}</span>
+             </span>`
+          : "";
+
+        const reservedPill = s.reservedForWaitlist
+          ? `<span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[0.7rem] font-medium text-slate-600 bg-slate-50 border border-slate-200">
+               <i class="fa-solid fa-lock text-[0.7rem]"></i>
+               <span>Seats reserved for waitlist</span>
+             </span>`
+          : "";
+
+        const card = document.createElement("article");
+        card.className =
+          "rounded-3xl border border-slate-200/80 bg-white/95 shadow-[0_18px_45px_rgba(15,23,42,0.06)] px-4 py-3.5 md:px-5 md:py-4";
+
+        card.innerHTML = `
+          <div class="flex flex-col gap-2.5">
+            <!-- Row 1: meta strip -->
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 flex-wrap min-w-0">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-brand-50 text-brand-700 px-2.5 py-0.5 text-[0.7rem] font-semibold tracking-wide uppercase">
+                  <span>${s.subjectDesc || "Course"}</span>
+                  ${s.courseNumber ? `<span class="text-slate-400">·</span><span>${s.courseNumber}</span>` : ""}
+                </span>
+                <span class="text-[0.7rem] font-mono text-slate-500">
+                  CRN ${s.crn || "—"}
+                </span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                ${wlPill || ""}
+                ${diffPill}
+              </div>
+            </div>
+
+            <!-- Row 2: title -->
+            <h2 class="text-sm md:text-[0.95rem] font-semibold text-slate-900 leading-snug line-clamp-2">
+              ${s.title}
+            </h2>
+
+            <!-- Row 3: schedule + location + modality -->
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.78rem] text-slate-600">
+              <span class="inline-flex items-center gap-1">
+                <i class="fa-regular fa-calendar text-[0.75rem] text-slate-400"></i>
+                <span>${s.meetingDays || "TBA"}</span>
+              </span>
+              ${s.meetingTime ? `
+              <span class="inline-flex items-center gap-1">
+                <i class="fa-regular fa-clock text-[0.75rem] text-slate-400"></i>
+                <span>${s.meetingTime}</span>
+              </span>` : ""}
+              ${locationDisplay ? `
+              <span class="inline-flex items-center gap-1">
+                <i class="fa-solid fa-location-dot text-[0.8rem] text-slate-400"></i>
+                <span>${locationDisplay}</span>
+              </span>` : ""}
+              ${deliveryPill}
+            </div>
+
+            <!-- Row 4: bottom bar - prof + seats -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 pt-2 border-t border-slate-100 mt-1">
+              <div class="flex flex-wrap items-center gap-2 text-[0.78rem] text-slate-700">
+                <span class="font-medium text-slate-800 flex items-center gap-1.5">
+                  <i class="fa-regular fa-user text-[0.8rem] text-slate-400"></i>
+                  <span>${s.instructorDisplay || "TBA"}</span>
+                </span>
+                <span class="text-slate-300 hidden sm:inline">•</span>
+                <span class="inline-flex items-center gap-1 text-slate-600">
+                  <i class="fa-solid fa-star text-amber-400 text-[0.7rem]"></i>
+                  <span>${ratingText}</span>
+                </span>
+                ${takeAgainText ? `
+                <span class="inline-flex items-center gap-1 text-slate-500">
+                  <i class="fa-solid fa-repeat text-[0.7rem]"></i>
+                  <span>${takeAgainText}</span>
+                </span>` : ""}
+                ${rmpLink}
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2 text-[0.78rem] text-slate-600">
+                <div class="flex items-center gap-1">
+                  ${seatStatusPill}
+                </div>
+                <div class="flex items-center gap-1">
+                  <span>${seatsText}</span>
+                  ${wlText ? `<span class="text-slate-300">•</span><span>${wlText}</span>` : ""}
+                </div>
+                ${reservedPill}
+              </div>
+            </div>
+          </div>
+        `;
+
+        resultsContainer.appendChild(card);
+      });
+    }
+// listeners
+    searchInput.addEventListener("input", render);
+    subjectFilter.addEventListener("change", render);
+    campusFilter.addEventListener("change", render);
+
+    difficultyChips.forEach(chip => {
+      chip.addEventListener("click", () => {
+        const selected = chip.getAttribute("data-diff") || "";
+        activeDifficulty = (activeDifficulty === selected) ? "" : selected;
+        difficultyChips.forEach(c => {
+          const val = c.getAttribute("data-diff") || "";
+          if (val === activeDifficulty) c.classList.add("chip-active");
+          else c.classList.remove("chip-active");
+        });
+        render();
+      });
+    });
+
+    clearDifficultyBtn.addEventListener("click", () => {
+      activeDifficulty = "";
+      difficultyChips.forEach(c => c.classList.remove("chip-active"));
+      render();
+    });
+
+    wlToggle.addEventListener("click", () => {
+      wlToggle.classList.toggle("bg-brand-600");
+      wlToggle.classList.toggle("border-brand-600");
+      const dot = wlToggle.querySelector(".dot");
+      const active = wlToggle.classList.contains("bg-brand-600");
+      goodWlOnly = active;
+      if (active) {
+        dot.classList.remove("translate-x-1", "bg-slate-300");
+        dot.classList.add("translate-x-5", "bg-white");
+      } else {
+        dot.classList.remove("translate-x-5", "bg-white");
+        dot.classList.add("translate-x-1", "bg-slate-300");
+      }
+      render();
+    });
+
+    
+    // === PDF course extraction helpers ===
+    function fileToArrayBuffer(file) {
+      return file.arrayBuffer();
+    }
+
+    async function extractFullTextFromPdf(data, pdfjs) {
+      const loadingTask = pdfjs.getDocument({ data });
+      const pdf = await loadingTask.promise;
+
+      let fullText = "";
+
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map((item) => item.str).join(" ");
+        fullText += pageText + "\n";
+      }
+
+      return fullText.trim();
+    }
+
+    function findMarkerIndex(text, marker, fromIndex = 0) {
+      if (typeof marker === "string") {
+        return text.indexOf(marker, fromIndex);
+      } else if (marker instanceof RegExp) {
+        const sliced = text.slice(fromIndex);
+        const match = sliced.match(marker);
+        if (!match) return -1;
+        return fromIndex + match.index;
+      }
+      throw new Error("marker must be string or RegExp");
+    }
+
+    function getMarkerLength(text, marker) {
+      if (typeof marker === "string") {
+        return marker.length;
+      } else if (marker instanceof RegExp) {
+        const match = text.match(marker);
+        return match ? match[0].length : 0;
+      }
+      throw new Error("marker must be string or RegExp");
+    }
+
+    function extractSection(fullText, startMarker, endMarker = null) {
+      let sectionText = fullText;
+
+      const startIdx = findMarkerIndex(fullText, startMarker);
+      if (startIdx !== -1) {
+        const afterStart = startIdx + getMarkerLength(fullText, startMarker);
+
+        if (endMarker != null) {
+          const endIdx = findMarkerIndex(fullText, endMarker, afterStart);
+          if (endIdx !== -1) {
+            sectionText = fullText.slice(afterStart, endIdx);
+          } else {
+            sectionText = fullText.slice(afterStart);
+          }
+        } else {
+          sectionText = fullText.slice(afterStart);
+        }
+      }
+
+      return sectionText;
+    }
+
+    function splitIntoRoughLines(sectionText) {
+      return sectionText
+        .split(/\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+    }
+
+    function explodeNumberedLines(lines) {
+      const result = [];
+
+      lines.forEach((line) => {
+        const parts = line.split(/(?=\d+[\.\)]\s)/);
+        parts.forEach((part) => {
+          const trimmed = part.trim();
+          if (trimmed) result.push(trimmed);
+        });
+      });
+
+      return result;
+    }
+
+    function extractNumberedCourseLines(lines) {
+      const result = [];
+
+      lines.forEach((line) => {
+        const match = line.match(/^(\d+[\.\)])\s*(.*)$/);
+        if (match) {
+          const courseText = match[2].trim();
+          if (courseText) result.push(courseText);
+        }
+      });
+
+      return result;
+    }
+
+    async function extractCoursesFromPdfFile(
+      file,
+      {
+        pdfjs,
+        startMarker = "Part 2: Desired Course Selection",
+        endMarker = "Part 2A",
+      } = {}
+    ) {
+      if (!pdfjs || typeof pdfjs.getDocument !== "function") {
+        throw new Error("You must pass a valid PDF.js object via options.pdfjs");
+      }
+
+      const arrayBuffer = await fileToArrayBuffer(file);
+      const fullText = await extractFullTextFromPdf(arrayBuffer, pdfjs);
+      const sectionText = extractSection(fullText, startMarker, endMarker);
+      const roughLines = splitIntoRoughLines(sectionText);
+      const explodedLines = explodeNumberedLines(roughLines);
+      const courses = extractNumberedCourseLines(explodedLines);
+
+      return { courses, fullText, sectionText };
+    }
+
+    // === Schedule Builder page wiring ===
+    const builderPdfInput = document.getElementById("builderPdfInput");
+    const builderRunBtn = document.getElementById("builderRunBtn");
+    const builderFileName = document.getElementById("builderFileName");
+    const builderCourseList = document.getElementById("builderCourseList");
+    const builderSectionDebug = document.getElementById("builderSectionDebug");
+    const builderCountBadge = document.getElementById("builderCountBadge");
+
+    let builderSelectedFile = null;
+
+    if (builderPdfInput && builderRunBtn) {
+      builderPdfInput.addEventListener("change", (e) => {
+        builderSelectedFile = e.target.files?.[0] || null;
+
+        if (builderSelectedFile) {
+          builderFileName.textContent = builderSelectedFile.name;
+          builderRunBtn.disabled = false;
+        } else {
+          builderFileName.textContent = "No file selected yet.";
+          builderRunBtn.disabled = true;
+        }
+
+        builderCourseList.innerHTML =
+          '<li class="text-xs text-slate-400">Ready when you are — click “Extract courses”.</li>';
+        if (builderSectionDebug) {
+          builderSectionDebug.textContent = "";
+        }
+        if (builderCountBadge) {
+          builderCountBadge.classList.add("hidden");
+          builderCountBadge.textContent = "";
+        }
+      });
+
+      builderRunBtn.addEventListener("click", async () => {
+        if (!builderSelectedFile) return;
+
+        builderRunBtn.disabled = true;
+        builderRunBtn.innerHTML =
+          '<i class="fa-solid fa-spinner fa-spin text-[0.8rem]"></i><span>Extracting…</span>';
+
+        builderCourseList.innerHTML =
+          '<li class="text-xs text-slate-500">Processing PDF… this stays in your browser.</li>';
+        if (builderSectionDebug) {
+          builderSectionDebug.textContent = "";
+        }
+
+        try {
+          const { courses, sectionText } = await extractCoursesFromPdfFile(
+            builderSelectedFile,
+            {
+              pdfjs: pdfjsLib,
+              startMarker: "Part 2: Desired Course Selection",
+              endMarker: "Part 2A",
+            }
+          );
+
+          builderCourseList.innerHTML = "";
+
+          if (!courses.length) {
+            builderCourseList.innerHTML =
+              '<li class="text-xs text-rose-500">No numbered course lines found in “Part 2”. Double-check that this is the right advisement form.</li>';
+          } else {
+            courses.forEach((course, index) => {
+              const li = document.createElement("li");
+              li.className =
+                "flex items-start gap-2 rounded-2xl border border-slate-100 bg-slate-50 px-3 py-2 text-[0.8rem] text-slate-800";
+              li.innerHTML = `
+                <span class="mt-0.5 text-[0.7rem] text-slate-400">${index + 1}.</span>
+                <span>${course}</span>
+              `;
+              builderCourseList.appendChild(li);
+            });
+          }
+
+          if (builderSectionDebug) {
+            builderSectionDebug.textContent = sectionText || "(No section text found.)";
+          }
+
+          if (builderCountBadge) {
+            builderCountBadge.textContent =
+              courses.length === 1
+                ? "1 course detected"
+                : `${courses.length} courses detected`;
+            builderCountBadge.classList.toggle("hidden", courses.length === 0);
+          }
+        } catch (err) {
+          console.error(err);
+          builderCourseList.innerHTML =
+            '<li class="text-xs text-rose-500">Error extracting courses. Open the console for details.</li>';
+        } finally {
+          builderRunBtn.disabled = !builderSelectedFile;
+          builderRunBtn.innerHTML =
+            '<i class="fa-solid fa-wand-magic-sparkles text-[0.8rem]"></i><span>Extract courses</span>';
+        }
+      });
+    }
+
+
+
+    // === Time preferences model & helpers ===
+    const TIME_GRID_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+    const TIME_START_MIN = 6 * 60;        // 6:00 AM
+    const TIME_END_MIN   = 23 * 60;       // 11:00 PM
+    const SLOT_MINUTES   = 30;
+    const GRID_SLOT_MINUTES = 60;
+
+    const timePrefsModel = {
+      selectedDays: new Set(),
+      defaultWindow: { start: 9 * 60, end: 16 * 60 },
+      dayOverrides: {}
+    };
+
+    function minutesToDisplay(mins) {
+      const h24 = Math.floor(mins / 60);
+      const m = mins % 60;
+      const period = h24 >= 12 ? "PM" : "AM";
+      const h12 = ((h24 + 11) % 12) + 1;
+      const mm = String(m).padStart(2, "0");
+      return `${h12}:${mm} ${period}`;
+    }
+
+    function normalizeWindow(start, end, minDuration = SLOT_MINUTES) {
+      let s = Math.max(TIME_START_MIN, Math.min(TIME_END_MIN, start));
+      let e = Math.max(TIME_START_MIN, Math.min(TIME_END_MIN, end));
+      if (e <= s) {
+        e = s + minDuration;
+        if (e > TIME_END_MIN) {
+          e = TIME_END_MIN;
+          s = e - minDuration;
+        }
+      }
+      return { start: s, end: e };
+    }
+
+    function setSelectedDays(dayKeys) {
+      timePrefsModel.selectedDays = new Set(dayKeys);
+    }
+
+    function toggleDayKey(dayKey) {
+      if (timePrefsModel.selectedDays.has(dayKey)) {
+        timePrefsModel.selectedDays.delete(dayKey);
+      } else {
+        timePrefsModel.selectedDays.add(dayKey);
+      }
+    }
+
+    function setDefaultWindow(start, end) {
+      const { start: s, end: e } = normalizeWindow(start, end);
+      timePrefsModel.defaultWindow.start = s;
+      timePrefsModel.defaultWindow.end = e;
+    }
+
+    function setDayOverride(dayKey, start, end) {
+      const { start: s, end: e } = normalizeWindow(start, end);
+      timePrefsModel.dayOverrides[dayKey] = { start: s, end: e };
+    }
+
+    function clearDayOverride(dayKey) {
+      delete timePrefsModel.dayOverrides[dayKey];
+    }
+
+    function getWindowForDay(dayKey) {
+      if (timePrefsModel.dayOverrides[dayKey]) {
+        return timePrefsModel.dayOverrides[dayKey];
+      }
+      return timePrefsModel.defaultWindow;
+    }
+
+    function isGridCellPreferred(dayKey, slotStartMinutes) {
+      if (!timePrefsModel.selectedDays.has(dayKey)) return false;
+      const { start, end } = getWindowForDay(dayKey);
+      const slotEnd = slotStartMinutes + GRID_SLOT_MINUTES;
+      return slotStartMinutes < end && slotEnd > start;
+    }
+
+    function generateTimeGrid() {
+      const rows = [];
+      for (let mins = TIME_START_MIN; mins <= TIME_END_MIN; mins += GRID_SLOT_MINUTES) {
+        const timeLabel = minutesToDisplay(mins);
+        const cells = TIME_GRID_DAYS.map((dayKey) => ({
+          dayKey,
+          isPreferred: isGridCellPreferred(dayKey, mins)
+        }));
+        rows.push({ timeLabel, startMinutes: mins, cells });
+      }
+      return rows;
+    }
+
+    function getTimeSummary() {
+      if (timePrefsModel.selectedDays.size === 0) {
+        return "Select at least one day and a time range.";
+      }
+      const dayList = Array.from(timePrefsModel.selectedDays);
+      const dayText = dayList.join(", ");
+      const def = timePrefsModel.defaultWindow;
+      let summary = `${dayText} • Default ${minutesToDisplay(def.start)} – ${minutesToDisplay(def.end)}`;
+
+      const customDays = Object.keys(timePrefsModel.dayOverrides).filter((d) =>
+        timePrefsModel.selectedDays.has(d)
+      );
+      if (customDays.length > 0) {
+        summary += ` (custom on ${customDays.join(", ")})`;
+      }
+      return summary;
+    }
+
+    function initTimePrefsUI() {
+      const dayButtons = document.querySelectorAll(".time-day-pill");
+      const fromSelect = document.getElementById("timeDefaultFrom");
+      const toSelect = document.getElementById("timeDefaultTo");
+      const gridBody = document.getElementById("timeGridBody");
+      const summaryEl = document.getElementById("timeSummaryText");
+
+      if (!fromSelect || !toSelect || !gridBody || !summaryEl || !dayButtons.length) {
+        return;
+      }
+
+      // populate dropdowns with 30-min increments
+      function populateTimeSelect(selectEl) {
+        selectEl.innerHTML = "";
+        for (let mins = TIME_START_MIN; mins <= TIME_END_MIN; mins += SLOT_MINUTES) {
+          const opt = document.createElement("option");
+          opt.value = String(mins);
+          opt.textContent = minutesToDisplay(mins);
+          selectEl.appendChild(opt);
+        }
+      }
+      populateTimeSelect(fromSelect);
+      populateTimeSelect(toSelect);
+
+      // default state: Mon–Thu selected, 9–4
+      setSelectedDays(["Mon", "Tue", "Wed", "Thu"]);
+      setDefaultWindow(9 * 60, 16 * 60);
+      fromSelect.value = String(timePrefsModel.defaultWindow.start);
+      toSelect.value = String(timePrefsModel.defaultWindow.end);
+
+      // sync day button styles
+      function syncDayButtons() {
+        dayButtons.forEach((btn) => {
+          const key = btn.getAttribute("data-day-key");
+          const isOn = timePrefsModel.selectedDays.has(key);
+          btn.classList.toggle("bg-sky-500", isOn);
+          btn.classList.toggle("text-white", isOn);
+          btn.classList.toggle("border-slate-200", !isOn);
+          btn.classList.toggle("bg-slate-50", !isOn);
+          btn.classList.toggle("text-slate-700", !isOn);
+        });
+      }
+
+      dayButtons.forEach((btn) => {
+        const key = btn.getAttribute("data-day-key");
+        btn.addEventListener("click", () => {
+          toggleDayKey(key);
+          syncDayButtons();
+          renderTimeGrid();
+        });
+      });
+
+      function handleDefaultChange() {
+        const start = parseInt(fromSelect.value, 10);
+        const end = parseInt(toSelect.value, 10);
+        setDefaultWindow(start, end);
+        // also nudge per-day dropdowns if they use default
+        syncCustomRows();
+        renderTimeGrid();
+      }
+
+      fromSelect.addEventListener("change", handleDefaultChange);
+      toSelect.addEventListener("change", handleDefaultChange);
+
+      // custom per-day rows
+      function syncCustomRows() {
+        TIME_GRID_DAYS.forEach((dayKey) => {
+          const row = document.querySelector(`[data-time-row="${dayKey}"]`);
+          if (!row) return;
+          const toggle = row.querySelector(`[data-time-custom-toggle="${dayKey}"]`);
+          const from = row.querySelector(`[data-time-custom-from="${dayKey}"]`);
+          const to = row.querySelector(`[data-time-custom-to="${dayKey}"]`);
+
+          if (!from.options.length) {
+            // populate once
+            [from, to].forEach((sel) => {
+              populateTimeSelect(sel);
+            });
+          }
+
+          if (!toggle.checked) {
+            clearDayOverride(dayKey);
+            from.disabled = true;
+            to.disabled = true;
+            // keep selects in sync with default
+            from.value = String(timePrefsModel.defaultWindow.start);
+            to.value = String(timePrefsModel.defaultWindow.end);
+          } else {
+            from.disabled = false;
+            to.disabled = false;
+            const start = parseInt(from.value, 10);
+            const end = parseInt(to.value, 10);
+            setDayOverride(dayKey, start, end);
+          }
+        });
+      }
+
+      TIME_GRID_DAYS.forEach((dayKey) => {
+        const row = document.querySelector(`[data-time-row="${dayKey}"]`);
+        if (!row) return;
+        const toggle = row.querySelector(`[data-time-custom-toggle="${dayKey}"]`);
+        const from = row.querySelector(`[data-time-custom-from="${dayKey}"]`);
+        const to = row.querySelector(`[data-time-custom-to="${dayKey}"]`);
+
+        // initialize selects with default window
+        [from, to].forEach((sel) => {
+          populateTimeSelect(sel);
+        });
+        from.value = String(timePrefsModel.defaultWindow.start);
+        to.value = String(timePrefsModel.defaultWindow.end);
+
+        const handler = () => {
+          syncCustomRows();
+          renderTimeGrid();
+        };
+        toggle.addEventListener("change", handler);
+        from.addEventListener("change", handler);
+        to.addEventListener("change", handler);
+      });
+
+      function renderTimeGrid() {
+        const grid = generateTimeGrid();
+        gridBody.innerHTML = "";
+        grid.forEach((row) => {
+          const tr = document.createElement("tr");
+          const timeCell = document.createElement("td");
+          timeCell.className = "px-2 py-1 border-t border-slate-100 text-right align-middle text-[0.7rem] text-slate-400";
+          timeCell.textContent = row.timeLabel;
+          tr.appendChild(timeCell);
+
+          row.cells.forEach((cell) => {
+            const td = document.createElement("td");
+            td.className = "px-1 py-0.5 border-t border-slate-100 align-middle";
+            const div = document.createElement("div");
+            div.className = "h-5 rounded-md";
+            if (cell.isPreferred) {
+              div.classList.add("bg-sky-500", "bg-opacity-90");
+            } else {
+              div.classList.add("bg-transparent");
+            }
+            td.appendChild(div);
+            tr.appendChild(td);
+          });
+
+          gridBody.appendChild(tr);
+        });
+
+        summaryEl.textContent = getTimeSummary();
+      }
+
+      // initial render
+      syncDayButtons();
+      syncCustomRows();
+      renderTimeGrid();
+    }
+
+    // kick off time preferences UI + initial data load
+    document.addEventListener("DOMContentLoaded", () => {
+      initTimePrefsUI();
+      loadData();
+    });
+  </script>
+</body>
+</html>
