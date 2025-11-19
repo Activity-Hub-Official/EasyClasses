@@ -5,6 +5,17 @@
   <title>EasyClasses SJU • Spring 2026 Class Finder</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <!-- Favicon -->
+  <link rel="icon" href="https://i.imgur.com/ZhBld9W.png" type="image/png" />
+  <link rel="apple-touch-icon" href="https://i.imgur.com/ZhBld9W.png" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="EasyClasses SJU • Spring 2026 Class Finder" />
+  <meta property="og:description" content="Browse sections, professor difficulty, and waitlist odds in a friendlier view than Banner." />
+  <meta property="og:image" content="https://i.imgur.com/7WmQ0kb.png" />
+  <meta property="og:type" content="website" />
+
+
   <!-- Google Font: Poppins -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -551,6 +562,43 @@
         </div>
       </div>
     </div>
+
+    <!-- Schedule options panel -->
+    <div class="mt-4 bg-slate-900/95 text-slate-50 rounded-3xl shadow-sm border border-slate-800/70 p-4 md:p-5 space-y-3">
+      <div class="flex items-center justify-between gap-2">
+        <div>
+          <h2 class="text-sm font-semibold flex items-center gap-2">
+            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300 text-xs">
+              <i class="fa-solid fa-calendar-check"></i>
+            </span>
+            Schedule options
+          </h2>
+          <p class="text-[0.72rem] text-slate-300 mt-1">
+            Once you’ve extracted your required courses and chosen your time windows, generate schedule options that balance easier professors, availability, and your preferences.
+          </p>
+        </div>
+        <button
+          id="generateScheduleBtn"
+          type="button"
+          class="inline-flex items-center gap-2 rounded-full bg-emerald-400/90 text-slate-950 text-xs font-semibold px-4 py-2 shadow-sm hover:bg-emerald-300 disabled:opacity-60 disabled:cursor-not-allowed transition"
+        >
+          <i class="fa-solid fa-wand-magic-sparkles text-[0.8rem]"></i>
+          <span>Generate schedules</span>
+        </button>
+      </div>
+      <p id="scheduleHelperText" class="text-[0.7rem] text-emerald-200/90">
+        Tip: Start by uploading your advisement PDF above. We’ll use the detected course numbers plus your time preferences here.
+      </p>
+      <div
+        id="scheduleOptionsContainer"
+        class="mt-2 space-y-2 text-[0.72rem]"
+      >
+        <div class="text-slate-300/90">
+          No schedules generated yet.
+        </div>
+      </div>
+    </div>
+
   </section>
 
 </div>
@@ -558,6 +606,7 @@
   <script>
     const SUBJECTS_API = "https://sheet2api.com/v1/ZPeTNTUrSFuL/all_subjects_spring_2026";
     const PROFS_API    = "https://sheet2api.com/v1/ZPeTNTUrSFuL/professor_ratings";
+    const SUBJECT_ABBREV_API = "https://sheet2api.com/v1/ZPeTNTUrSFuL/subjects-abbreviations";
 
     const searchInput     = document.getElementById("searchInput");
     const subjectFilter   = document.getElementById("subjectFilter");
@@ -569,77 +618,67 @@
     const themeToggle     = document.getElementById("themeToggle");
     const clearDifficultyBtn = document.getElementById("clearDifficulty");
 
-    // SPA-style navigation with deep links (no full page reloads)
+    
+    // SPA-style nav + deeplinks
     function setActivePage(page) {
-      // nav links (desktop + mobile)
+      // highlight nav
       document.querySelectorAll("[data-nav]").forEach(link => {
         const linkPage = link.getAttribute("data-nav");
         const isActive = linkPage === page;
         link.classList.toggle("bg-sky-500/90", isActive);
         link.classList.toggle("text-white", isActive);
-        if (link.tagName === "A") {
-          link.classList.toggle("text-slate-300", !isActive);
-        }
+        link.classList.toggle("text-slate-300", !isActive);
       });
 
-      // show the correct page panel(s)
-      const pagePanels = document.querySelectorAll("[data-page-panel]");
-      pagePanels.forEach((panel) => {
+      // show the correct page panel
+      document.querySelectorAll("[data-page-panel]").forEach(panel => {
         const name = panel.getAttribute("data-page-panel");
-        const isActive = name === page;
-        panel.classList.toggle("hidden", !isActive);
+        panel.classList.toggle("hidden", name !== page);
       });
     }
 
-    // Initial page from URL (?page=...)
-    const navParams = new URLSearchParams(window.location.search);
-    const rawInitialPage = navParams.get("page") || "course-search";
-    const initialPage = rawInitialPage === "home" ? "course-search" : rawInitialPage;
-    setActivePage(initialPage);
+    function initSpaNav() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialPage = urlParams.get("page") || "course-search";
+      setActivePage(initialPage);
 
-    // Intercept nav clicks to avoid full reloads
-    document.querySelectorAll("[data-nav]").forEach(link => {
-      link.addEventListener("click", (event) => {
-        event.preventDefault();
-        const pageAttr = link.getAttribute("data-nav");
-        const page = pageAttr === "home" ? "course-search" : pageAttr;
-        if (!page) return;
+      // intercept nav clicks
+      document.querySelectorAll("[data-nav]").forEach(link => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const page = link.getAttribute("data-nav") || "course-search";
+          const url = new URL(window.location.href);
+          url.searchParams.set("page", page);
+          window.history.pushState({ page }, "", url);
+          setActivePage(page);
+        });
+      });
 
-        const url = new URL(window.location);
-        url.searchParams.set("page", pageAttr);
-        window.history.pushState({ page }, "", url);
-
+      // support back/forward buttons
+      window.addEventListener("popstate", (event) => {
+        const statePage = event.state && event.state.page;
+        const url = new URL(window.location.href);
+        const page = statePage || url.searchParams.get("page") || "course-search";
         setActivePage(page);
-
-        // if mobile nav is open, close it
-        if (typeof mobileNav !== "undefined" && mobileNav && !mobileNav.classList.contains("hidden")) {
-          mobileNav.classList.add("hidden");
-        }
       });
-    });
 
-    // Handle browser back/forward navigation
-    window.addEventListener("popstate", (event) => {
-      const statePage = event.state && event.state.page;
-      const params = new URLSearchParams(window.location.search);
-      const rawPage = statePage || params.get("page") || "course-search";
-      const page = rawPage === "home" ? "course-search" : rawPage;
-      setActivePage(page);
-    });
-
-    const mobileNavToggle = document.getElementById("mobileNavToggle");
-    const mobileNav = document.getElementById("mobileNav");
-    if (mobileNavToggle && mobileNav) {
-      mobileNavToggle.addEventListener("click", () => {
-        mobileNav.classList.toggle("hidden");
-      });
+      // mobile nav toggle
+      const mobileNavToggle = document.getElementById("mobileNavToggle");
+      const mobileNav = document.getElementById("mobileNav");
+      if (mobileNavToggle && mobileNav) {
+        mobileNavToggle.addEventListener("click", () => {
+          mobileNav.classList.toggle("hidden");
+        });
+      }
     }
 
-
-    let activeDifficulty = "";
+let activeDifficulty = "";
     let goodWlOnly       = false;
     let sections         = [];
     let dataLoaded       = false;
+    let isLoadingData    = false;
+    let subjectAbbrevMap = {};
+    let sectionsByCourseKey = new Map();
 
     // Add/drop deadline + WL model
     const ADD_DROP_DEADLINE       = new Date("2026-01-27T23:59:59-05:00");
@@ -706,6 +745,51 @@
       }
       return entries;
     }
+
+   
+    function timeStringToMinutes(part) {
+      if (!part || typeof part !== "string") return null;
+      const m = part.trim().match(/(\d{1,2}):(\d{2})\s*([AP]M)/i);
+      if (!m) return null;
+      let hour = parseInt(m[1], 10);
+      const minute = parseInt(m[2], 10);
+      const mer = m[3].toUpperCase();
+      if (mer === "PM" && hour !== 12) hour += 12;
+      if (mer === "AM" && hour === 12) hour = 0;
+      return hour * 60 + minute;
+    }
+
+    function parseTimeRangeToMinutes(rangeStr) {
+      if (!rangeStr || typeof rangeStr !== "string") return null;
+      const match = rangeStr.match(/(\d{1,2}:\d{2}\s*[AP]M)\s*-\s*(\d{1,2}:\d{2}\s*[AP]M)/i);
+      if (!match) return null;
+      const startMin = timeStringToMinutes(match[1]);
+      const endMin = timeStringToMinutes(match[2]);
+      if (startMin == null || endMin == null) return null;
+      return { startMin, endMin };
+    }
+
+    function deriveMeetingDayKeys(rawDays) {
+      if (!rawDays) return [];
+      const text = String(rawDays).toLowerCase();
+      const result = new Set();
+      const map = {
+        monday: "Mon", mon: "Mon",
+        tuesday: "Tue", tue: "Tue",
+        wednesday: "Wed", wed: "Wed",
+        thursday: "Thu", thu: "Thu", thur: "Thu",
+        friday: "Fri", fri: "Fri",
+        saturday: "Sat", sat: "Sat",
+        sunday: "Sun", sun: "Sun"
+      };
+      Object.keys(map).forEach((token) => {
+        if (text.includes(token)) {
+          result.add(map[token]);
+        }
+      });
+      return Array.from(result);
+    }
+
 
     // Status → seats + WL
     function parseStatus(raw) {
@@ -960,6 +1044,32 @@
       // Delivery mode
       const delivery = getDeliveryModeFromMeetings(meetings, campus);
 
+      // Course key & normalized time slots for schedule builder
+      const subjectAbbrev =
+        subjectAbbrevMap && subjectAbbrevMap[subjectDesc]
+          ? subjectAbbrevMap[subjectDesc]
+          : null;
+      const courseKey =
+        subjectAbbrev && courseNumber
+          ? subjectAbbrev + " " + String(courseNumber).trim()
+          : null;
+
+      const timeSlots = [];
+      if (meetings && meetings.length) {
+        meetings.forEach((m) => {
+          const dayKeys = deriveMeetingDayKeys(m.rawDays || meetingDays);
+          const range = parseTimeRangeToMinutes(m.time || meetingTime);
+          if (!range || !dayKeys.length) return;
+          dayKeys.forEach((dayKey) => {
+            timeSlots.push({
+              day: dayKey,
+              startMin: range.startMin,
+              endMin: range.endMin
+            });
+          });
+        });
+      }
+
       return {
         crn,
         title,
@@ -987,25 +1097,37 @@
         reservedForWaitlist: status.reservedForWaitlist,
         locationDetail,
         deliveryCode:  delivery.code,
-        deliveryLabel: delivery.label
+        deliveryLabel: delivery.label,
+        subjectAbbrev,
+        courseKey,
+        timeSlots
       };
     }
 
     // Load data
+    
     async function loadData() {
-      if (dataLoaded) return;
+      if (dataLoaded || isLoadingData) return;
+
       try {
+        isLoadingData = true;
         statusText.textContent = "Loading sections from APIs…";
 
+        //
+        // 1) REQUIRED APIs: subjects + prof ratings
+        //
         const [subjectsRes, profRes] = await Promise.all([
           fetch(SUBJECTS_API),
           fetch(PROFS_API)
         ]);
-        if (!subjectsRes.ok || !profRes.ok) throw new Error("API error");
+        if (!subjectsRes.ok || !profRes.ok) {
+          throw new Error("API error loading subjects/profs");
+        }
 
         const subjectsJson = await subjectsRes.json();
         const profJson     = await profRes.json();
 
+        // Build professor map
         const profMap = {};
         (profJson || []).forEach(p => {
           if (p && p.raw_name) {
@@ -1013,15 +1135,57 @@
           }
         });
 
+        //
+        // 2) OPTIONAL API: subject abbreviations
+        //    (fail-soft: warn in console, but do NOT break the UI)
+        //
+        let abbrevJson = [];
+        try {
+          const abbrevRes = await fetch(SUBJECT_ABBREV_API);
+          if (abbrevRes.ok) {
+            abbrevJson = await abbrevRes.json();
+          } else {
+            console.warn("Abbrev API returned non-OK status:", abbrevRes.status);
+          }
+        } catch (err) {
+          console.warn("Abbrev API fetch failed, continuing without it:", err);
+        }
+
+        subjectAbbrevMap = {};
+        (abbrevJson || []).forEach(row => {
+          const desc = row["Subject Description"];
+          const abbr = row["Abbreviation"];
+          if (desc && abbr) {
+            subjectAbbrevMap[String(desc).trim()] = String(abbr).trim();
+          }
+        });
+
+        //
+        // 3) Build sections + courseKey index
+        //
         sections = (subjectsJson || []).map(row => buildSectionObject(row, profMap));
 
-        // sort
+        sectionsByCourseKey = new Map();
+        sections.forEach(sec => {
+          if (sec && sec.courseKey) {
+            if (!sectionsByCourseKey.has(sec.courseKey)) {
+              sectionsByCourseKey.set(sec.courseKey, []);
+            }
+            sectionsByCourseKey.get(sec.courseKey).push(sec);
+          }
+        });
+
+        //
+        // 4) Sort & render
+        //
         sections.sort((a, b) => {
           const sA = a.subjectDesc.localeCompare(b.subjectDesc);
           if (sA !== 0) return sA;
+
           const numA = parseInt(a.courseNumber || 0, 10);
           const numB = parseInt(b.courseNumber || 0, 10);
           if (numA !== numB) return numA - numB;
+
           return String(a.crn || "").localeCompare(String(b.crn || ""));
         });
 
@@ -1031,8 +1195,11 @@
       } catch (err) {
         console.error(err);
         statusText.textContent = "Error loading data. Please refresh.";
+      } finally {
+        isLoadingData = false;
       }
     }
+
 
     function populateFilters() {
       const subjects = new Set();
@@ -1439,10 +1606,43 @@
       const fullText = await extractFullTextFromPdf(arrayBuffer, pdfjs);
       const sectionText = extractSection(fullText, startMarker, endMarker);
       const roughLines = splitIntoRoughLines(sectionText);
+
       const explodedLines = explodeNumberedLines(roughLines);
       const courses = extractNumberedCourseLines(explodedLines);
 
       return { courses, fullText, sectionText };
+    }
+
+    function parseCourseLineToObject(line) {
+      const raw = String(line || "").trim();
+      if (!raw) return null;
+
+      // Match patterns like "ACC 2338", "MTH-1023", "ACC2338" at the start
+      const match = raw.match(/^([A-Z]{2,4})\s*-?\s*(\d{3,4}[A-Z]?)/);
+      if (match) {
+        const subjectAbbrev = match[1];
+        const courseNumber = match[2];
+        const courseKey = subjectAbbrev + " " + courseNumber;
+        const title = raw.slice(match[0].length).trim();
+        return {
+          raw,
+          type: "named",
+          subjectAbbrev,
+          courseNumber,
+          courseKey,
+          title
+        };
+      }
+
+      // Fallback bucket (electives / generic requirements we couldn't parse)
+      return {
+        raw,
+        type: "placeholder",
+        subjectAbbrev: null,
+        courseNumber: null,
+        courseKey: null,
+        title: raw
+      };
     }
 
     // === Schedule Builder page wiring ===
@@ -1452,8 +1652,13 @@
     const builderCourseList = document.getElementById("builderCourseList");
     const builderSectionDebug = document.getElementById("builderSectionDebug");
     const builderCountBadge = document.getElementById("builderCountBadge");
+    const generateScheduleBtn = document.getElementById("generateScheduleBtn");
+    const scheduleOptionsContainer = document.getElementById("scheduleOptionsContainer");
+    const scheduleHelperText = document.getElementById("scheduleHelperText");
 
     let builderSelectedFile = null;
+    let builderDetectedCoursesRaw = [];
+    let builderParsedCourses = [];
 
     if (builderPdfInput && builderRunBtn) {
       builderPdfInput.addEventListener("change", (e) => {
@@ -1501,6 +1706,12 @@
             }
           );
 
+          // store parsed courses for schedule generation
+          builderDetectedCoursesRaw = courses.slice();
+          builderParsedCourses = courses
+            .map(parseCourseLineToObject)
+            .filter(Boolean);
+
           builderCourseList.innerHTML = "";
 
           if (!courses.length) {
@@ -1539,10 +1750,78 @@
           builderRunBtn.innerHTML =
             '<i class="fa-solid fa-wand-magic-sparkles text-[0.8rem]"></i><span>Extract courses</span>';
         }
+
       });
     }
 
+    // Hook up schedule generation button
+    if (generateScheduleBtn && scheduleOptionsContainer) {
+      generateScheduleBtn.addEventListener("click", async () => {
+        const originalLabel = generateScheduleBtn.innerHTML;
+        generateScheduleBtn.disabled = true;
+        generateScheduleBtn.innerHTML =
+          '<i class="fa-solid fa-spinner fa-spin text-[0.8rem]"></i><span>Generating…</span>';
 
+        try {
+          await loadData();
+
+          if (!builderParsedCourses || builderParsedCourses.length === 0) {
+            scheduleOptionsContainer.innerHTML =
+              '<div class="text-rose-200 text-[0.72rem]">No parsed courses found yet. Upload your advisement PDF and click “Extract courses” first.</div>';
+            return;
+          }
+
+          const namedCourses = builderParsedCourses.filter(c => c.type === "named" && c.courseKey);
+          const placeholders = builderParsedCourses.filter(c => c.type === "placeholder" || !c.courseKey);
+
+          if (namedCourses.length === 0) {
+            scheduleOptionsContainer.innerHTML =
+              '<div class="text-rose-200 text-[0.72rem]">We couldn’t recognize any standard course numbers (like “ACC 2338”). You can still use this section as notes, but schedule generation needs course numbers.</div>';
+            return;
+          }
+
+          const courseEntries = [];
+
+          namedCourses.forEach(course => {
+            const sectionsForCourse = sectionsByCourseKey.get(course.courseKey) || [];
+            if (!sectionsForCourse.length) return;
+
+            const scored = sectionsForCourse.map(sec => {
+              const score = scoreSectionOverall(sec);
+              return { section: sec, score };
+            });
+
+            scored.sort((a, b) => b.score.total - a.score.total);
+
+            courseEntries.push({
+              course,
+              candidates: scored.slice(0, 8)
+            });
+          });
+
+          if (!courseEntries.length) {
+            scheduleOptionsContainer.innerHTML =
+              '<div class="text-rose-200 text-[0.72rem]">None of the detected courses matched actual Spring 2026 sections. Double-check that your advisement sheet is for Spring 2026.</div>';
+            return;
+          }
+
+          const chosen = buildGreedySchedule(courseEntries);
+
+          renderScheduleOptions({
+            courseEntries,
+            chosen,
+            placeholders
+          });
+        } catch (err) {
+          console.error(err);
+          scheduleOptionsContainer.innerHTML =
+            '<div class="text-rose-200 text-[0.72rem]">Error generating schedules. Open the console for details.</div>';
+        } finally {
+          generateScheduleBtn.disabled = false;
+          generateScheduleBtn.innerHTML = originalLabel;
+        }
+      });
+    }
 
     // === Time preferences model & helpers ===
     const TIME_GRID_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
@@ -1807,11 +2086,265 @@
       renderTimeGrid();
     }
 
-    // kick off time preferences UI + initial data load
+    
+    // === Schedule scoring & rendering helpers ===
+    const DAY_KEY_LABELS = {
+      Mon: "Monday",
+      Tue: "Tuesday",
+      Wed: "Wednesday",
+      Thu: "Thursday",
+      Fri: "Friday",
+      Sat: "Saturday",
+      Sun: "Sunday"
+    };
+
+    function getPreferredWindowForDay(dayKey) {
+      const override = timePrefsModel.dayOverrides[dayKey];
+      if (override) return { start: override.start, end: override.end };
+      return {
+        start: timePrefsModel.defaultWindow.start,
+        end: timePrefsModel.defaultWindow.end
+      };
+    }
+
+    function scoreSectionTimeFit(section) {
+      if (!section.timeSlots || !section.timeSlots.length || timePrefsModel.selectedDays.size === 0) {
+        return 0;
+      }
+      let score = 0;
+      let counted = 0;
+
+      section.timeSlots.forEach((slot) => {
+        const dayKey = slot.day;
+        if (!dayKey) return;
+
+        if (!timePrefsModel.selectedDays.has(dayKey)) {
+          // class meets on a day the student didn't select
+          score -= 2;
+          return;
+        }
+
+        const pref = getPreferredWindowForDay(dayKey);
+        const slotStart = slot.startMin;
+        const slotEnd = slot.endMin;
+
+        const overlapStart = Math.max(pref.start, slotStart);
+        const overlapEnd = Math.min(pref.end, slotEnd);
+
+        if (overlapEnd <= overlapStart) {
+          // no overlap, penalize by distance
+          const delta =
+            slotStart > pref.end
+              ? slotStart - pref.end
+              : pref.start - slotEnd;
+          score -= Math.min(4, delta / 30); // up to -4 pts based on distance in 30‑min steps
+        } else {
+          const overlap = overlapEnd - overlapStart;
+          const span = Math.max(1, slotEnd - slotStart);
+          const ratio = overlap / span; // 0–1
+          score += ratio * 4; // up to +4 pts for perfect overlap
+        }
+
+        counted++;
+      });
+
+      if (!counted) return score;
+      return score / counted;
+    }
+
+    function scoreSectionEase(section) {
+      const diffPercent =
+        typeof section.difficultyPercent === "number"
+          ? section.difficultyPercent
+          : 50;
+      const baseEase = 100 - diffPercent; // higher = easier
+
+      let bonus = 0;
+      if (section.avgRating != null) {
+        bonus += (section.avgRating - 2.5); // tiny nudge
+      }
+      if (section.wouldTakeAgain != null) {
+        bonus += section.wouldTakeAgain / 25; // up to ~4 pts
+      }
+      return baseEase / 10 + bonus; // rough 0–20 range
+    }
+
+    function scoreSectionAvailability(section) {
+      if (!section.isFull) return 5; // open seats
+      if (section.wlChance == null) return 0;
+      if (section.wlChance >= 0.7) return 3;
+      if (section.wlChance >= 0.4) return 2;
+      if (section.wlChance >= 0.2) return 1;
+      return 0;
+    }
+
+    function scoreSectionOverall(section) {
+      const timeScore = scoreSectionTimeFit(section);
+      const easeScore = scoreSectionEase(section);
+      const availScore = scoreSectionAvailability(section);
+      return {
+        timeScore,
+        easeScore,
+        availScore,
+        total: timeScore * 1.5 + easeScore + availScore
+      };
+    }
+
+    function sectionsConflict(a, b) {
+      if (!a.timeSlots || !b.timeSlots) return false;
+      for (const slotA of a.timeSlots) {
+        for (const slotB of b.timeSlots) {
+          if (!slotA.day || !slotB.day) continue;
+          if (slotA.day !== slotB.day) continue;
+          if (slotA.startMin < slotB.endMin && slotB.startMin < slotA.endMin) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function buildGreedySchedule(courseEntries) {
+      const chosen = [];
+      courseEntries.forEach((entry) => {
+        const { candidates } = entry;
+        for (const c of candidates) {
+          const sec = c.section;
+          const hasConflict = chosen.some((already) => sectionsConflict(already, sec));
+          if (!hasConflict) {
+            chosen.push(sec);
+            break;
+          }
+        }
+      });
+      return chosen;
+    }
+
+    function renderScheduleOptions({ courseEntries, chosen, placeholders }) {
+      if (!scheduleOptionsContainer) return;
+
+      const byCrn = new Set(chosen.map((s) => s.crn));
+
+      const lines = [];
+
+      // Summary header
+      const totalCourses = courseEntries.length + (placeholders ? placeholders.length : 0);
+      lines.push(`
+        <div class="rounded-2xl border border-emerald-500/40 bg-emerald-900/40 p-3 flex flex-col gap-1">
+          <div class="flex items-center gap-2 text-[0.78rem]">
+            <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/30 text-emerald-50 text-[0.65rem]">
+              <i class="fa-solid fa-sparkles"></i>
+            </span>
+            <span class="font-semibold text-emerald-50">
+              Prototype schedule (greedy fit)
+            </span>
+          </div>
+          <p class="text-[0.7rem] text-emerald-100/90">
+            We picked one section per detected course, preferring easier professors, stronger waitlist odds, and classes inside your chosen time windows.
+          </p>
+          <p class="text-[0.7rem] text-emerald-100/80">
+            Courses covered: ${chosen.length} of ${totalCourses}.
+          </p>
+        </div>
+      `);
+
+      // Per‑course cards
+      courseEntries.forEach((entry) => {
+        const { course, candidates } = entry;
+        if (!candidates.length) return;
+        const best = candidates[0].section;
+        const picked = chosen.find((s) => s.crn === best.crn) || best;
+        const pickedScore = scoreSectionOverall(picked);
+
+        const days = picked.meetingDays || "TBA";
+        const time = picked.meetingTime || "";
+        const statusLabel = picked.isFull
+          ? (picked.wlRem != null && picked.wlTot != null
+              ? `Waitlist: ${picked.wlRem} of ${picked.wlTot} spots left`
+              : "Section full")
+          : (picked.seatsRem != null && picked.seatsTot != null
+              ? `Seats: ${picked.seatsRem} of ${picked.seatsTot} open`
+              : "Open");
+
+        lines.push(`
+          <div class="rounded-2xl border border-slate-800/60 bg-slate-900/60 p-3">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <div class="text-[0.75rem] font-semibold text-slate-50">
+                  ${course.courseKey || course.raw}
+                </div>
+                <div class="text-[0.7rem] text-slate-300">
+                  ${picked.title || ""}
+                </div>
+                <div class="mt-1 text-[0.7rem] text-slate-300/90">
+                  <span class="inline-flex items-center gap-1">
+                    <i class="fa-regular fa-clock text-[0.65rem]"></i>
+                    <span>${days} • ${time || "TBA"}</span>
+                  </span>
+                  ${picked.locationDetail ? ` · <span>${picked.locationDetail}</span>` : ""}
+                </div>
+              </div>
+              <div class="text-right text-[0.68rem] text-slate-300 space-y-0.5">
+                <div>
+                  <span class="inline-flex items-center gap-1">
+                    <i class="fa-regular fa-user text-[0.65rem]"></i>
+                    <span>${picked.instructorDisplay || "TBA"}</span>
+                  </span>
+                </div>
+                <div class="text-[0.65rem] text-slate-400">
+                  Diff: ${picked.difficultyLabel || "Unknown"}
+                  ${picked.avgRating ? ` · Rating: ${picked.avgRating.toFixed(1)}` : ""}
+                  ${picked.numRatings ? ` (${picked.numRatings} ratings)` : ""}
+                </div>
+                <div class="text-[0.65rem] ${picked.isFull ? "text-amber-300" : "text-emerald-300"}">
+                  ${statusLabel}
+                </div>
+              </div>
+            </div>
+            <div class="mt-1 flex flex-wrap gap-2 text-[0.62rem] text-slate-300/90">
+              <span class="inline-flex items-center gap-1 rounded-full bg-slate-800/80 px-2 py-0.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span>Time fit: ${pickedScore.timeScore.toFixed(1)}</span>
+              </span>
+              <span class="inline-flex items-center gap-1 rounded-full bg-slate-800/80 px-2 py-0.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+                <span>Ease: ${pickedScore.easeScore.toFixed(1)}</span>
+              </span>
+              <span class="inline-flex items-center gap-1 rounded-full bg-slate-800/80 px-2 py-0.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                <span>Availability: ${pickedScore.availScore.toFixed(1)}</span>
+              </span>
+            </div>
+          </div>
+        `);
+      });
+
+      if (placeholders && placeholders.length) {
+        lines.push(`
+          <div class="mt-1 rounded-2xl border border-slate-800/60 bg-slate-900/40 p-3 text-[0.7rem] text-slate-200">
+            <div class="font-semibold mb-1">Unstructured items</div>
+            <p class="text-[0.68rem] text-slate-300/90 mb-1">
+              We found ${placeholders.length} line(s) we treated as generic electives or notes:
+            </p>
+            <ul class="list-disc pl-4 space-y-0.5">
+              ${placeholders
+                .map((p) => `<li class="text-[0.68rem] text-slate-200">${p.raw}</li>`)
+                .join("")}
+            </ul>
+          </div>
+        `);
+      }
+
+      scheduleOptionsContainer.innerHTML = lines.join("");
+    }
+
+// kick off nav + time preferences + initial data load
     document.addEventListener("DOMContentLoaded", () => {
+      initSpaNav();
       initTimePrefsUI();
       loadData();
     });
   </script>
 </body>
 </html>
+
