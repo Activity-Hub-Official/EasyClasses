@@ -103,22 +103,24 @@
     background: transparent;
   }
 
-/* Hide window scrollbar only in AI Chat mode */
-  html.ai-chat-mode,
-  body.ai-chat-mode {
-    overflow-y: hidden;
-  }
+/* Desktop-only window scrollbar + composer behavior in AI Chat */
+  @media (min-width: 1024px) {
+    html.ai-chat-mode,
+    body.ai-chat-mode {
+      overflow-y: hidden;
+    }
 
-/* Force composer to stay visible in AI Chat */
-body.ai-chat-mode .ai-chat-composer {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 60;
-  background: transparent;
-  padding-bottom: env(safe-area-inset-bottom);
-}
+    body.ai-chat-mode .ai-chat-composer {
+      position: fixed;
+      left: 16rem; /* match lg sidebar w-64 */
+      right: 0;
+      bottom: 0;
+      width: calc(100% - 16rem);
+      z-index: 60;
+      background: transparent;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  }
 
 </style>
 
@@ -133,8 +135,75 @@ body.ai-chat-mode .ai-chat-composer {
 </head>
 <body class="min-h-screen bg-gradient-to-b from-slate-50 via-slate-50 to-slate-100 text-slate-900">
     <!-- Sidebar Layout -->
-  <div class="min-h-screen flex">
-    <aside class="w-64 flex flex-col border-r border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 h-screen">
+  <div class="min-h-screen flex flex-col lg:flex-row">
+    <!-- Mobile top bar -->
+    <header class="lg:hidden sticky top-0 z-40 bg-slate-950/90 backdrop-blur border-b border-slate-800/80 flex items-center justify-between px-4 py-2">
+      <div class="flex items-center gap-2">
+        <div class="h-8 w-8 rounded-xl overflow-hidden ring-1 ring-slate-700/70">
+          <img
+            src="https://i.imgur.com/ZhBld9W.png"
+            alt="EasyClasses logo"
+            class="h-full w-full object-cover"
+          />
+        </div>
+        <div class="flex flex-col">
+          <span class="text-sm font-semibold text-slate-50">
+            EasyClasses SJU
+          </span>
+          <span class="text-[11px] text-slate-400">
+            Spring 2026 Tools
+          </span>
+        </div>
+      </div>
+      <button
+        id="mobileNavToggle"
+        type="button"
+        class="inline-flex items-center gap-1 rounded-full border border-slate-700 bg-slate-900/80 px-3 py-1.5 text-[11px] font-medium text-slate-100 shadow-sm"
+      >
+        <i class="fa-solid fa-bars text-xs"></i>
+        <span>Menu</span>
+      </button>
+    </header>
+
+    <!-- Mobile nav drawer -->
+    <nav
+      id="mobileNav"
+      class="lg:hidden hidden bg-slate-950 border-b border-slate-800/80 z-30"
+    >
+      <div class="px-3 py-2 space-y-1">
+        <a href="?page=home"
+           data-nav="home"
+           class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-white/5">
+          <i class="fa-solid fa-house text-xs opacity-75"></i>
+          <span>Overview</span>
+        </a>
+        <a href="?page=course-search"
+           data-nav="course-search"
+           class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-white/5">
+          <i class="fa-solid fa-magnifying-glass text-xs opacity-75"></i>
+          <span>Course Search</span>
+        </a>
+        <a href="?page=schedule-builder"
+           data-nav="schedule-builder"
+           class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-white/5">
+          <i class="fa-solid fa-calendar-plus text-xs opacity-75"></i>
+          <span>Schedule Builder</span>
+        </a>
+        <a href="?page=schedule-optimizer"
+           data-nav="schedule-optimizer"
+           class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-white/5">
+          <i class="fa-solid fa-wand-magic-sparkles text-xs opacity-75"></i>
+          <span>Schedule Optimizer</span>
+        </a>
+        <a href="?page=ai-chat"
+           data-nav="ai-chat"
+           class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-white/5">
+          <i class="fa-solid fa-comments text-xs opacity-75"></i>
+          <span>AI Chat</span>
+        </a>
+      </div>
+    </nav>
+    <aside class="hidden lg:flex w-64 flex flex-col border-r border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 h-screen">
       <div class="px-4 py-4 flex items-center gap-3 border-b border-slate-800/80">
         <div class="h-9 w-9 rounded-xl overflow-hidden ring-1 ring-slate-700/70 shadow-sm">
           <img
@@ -995,7 +1064,7 @@ body.ai-chat-mode .ai-chat-composer {
 
   
 <!-- AI CHAT PAGE PANEL -->
-  <section data-page-panel="ai-chat" class="hidden h-[calc(100vh-4.5rem)] flex flex-col bg-slate-50 md:bg-gradient-to-b md:from-slate-50 md:to-slate-100 dark:bg-slate-950 -mx-4 md:mx-0 overflow-hidden">
+  <section data-page-panel="ai-chat" class="hidden min-h-[calc(100vh-4.5rem)] lg:h-[calc(100vh-4.5rem)] flex flex-col bg-slate-50 md:bg-gradient-to-b md:from-slate-50 md:to-slate-100 dark:bg-slate-950 -mx-4 md:mx-0 overflow-hidden">
     <div class="flex-1 flex flex-col h-full">
       <!-- Scrollable header + chat -->
       <div class="flex-1 min-h-0 overflow-y-auto ai-chat-scroll">
@@ -1029,7 +1098,7 @@ body.ai-chat-mode .ai-chat-composer {
                 <div class="flex items-center gap-2">
                   <button id="aiChatUploadBtn" type="button"
                     class="inline-flex items-center gap-2 px-3 h-11 rounded-2xl border border-slate-200 bg-white text-slate-700 hover:border-sky-400 hover:bg-sky-50 text-sm shadow-sm">
-                    <i class="fa-regular fa-paperclip"></i>
+                    <i class="fa-solid fa-paperclip"></i>
                     <span>Upload</span>
                   </button>
                   <input id="aiChatFileInput" type="file" class="hidden" />
@@ -3530,6 +3599,72 @@ window.analyzeLockedSchedule = analyzeLockedSchedule;
       // Unified AI Chat message system
       const aiChatMessages = [];
 
+      // --- AI Chat helpers: inline markdown + FontAwesome normalization ---
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function renderInlineMarkdown(text) {
+        const esc = escapeHtml(text || "");
+        // bold: **text**
+        return esc
+          .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+          .replace(/\n/g, "<br>");
+      }
+
+      function normalizeFa(iconClass) {
+        if (!iconClass) return "";
+        // keep brand icons as-is; otherwise default to solid
+        if (iconClass.includes("fa-brands")) return iconClass;
+        return iconClass.replace(/\bfa-regular\b|\bfa-light\b|\bfa-thin\b|\bfa-duotone\b/g, "fa-solid");
+      }
+
+      
+      function formatMinutesToTime(mins) {
+        mins = Math.max(0, parseInt(mins || 0, 10));
+        const h24 = Math.floor(mins / 60);
+        const m = mins % 60;
+        const ampm = h24 >= 12 ? "PM" : "AM";
+        let h12 = h24 % 12;
+        if (h12 === 0) h12 = 12;
+        return `${h12}:${m.toString().padStart(2,"0")} ${ampm}`;
+      }
+
+      function attachCustomTimeSlider() {
+        const startEl = document.getElementById("customTimeStart");
+        const endEl   = document.getElementById("customTimeEnd");
+        const startLb = document.getElementById("customTimeStartLabel");
+        const endLb   = document.getElementById("customTimeEndLabel");
+        if (!startEl || !endEl || !startLb || !endLb) return;
+
+        function syncLabels() {
+          startLb.textContent = formatMinutesToTime(startEl.value);
+          endLb.textContent   = formatMinutesToTime(endEl.value);
+        }
+
+        startEl.addEventListener("input", () => {
+          if (parseInt(startEl.value,10) >= parseInt(endEl.value,10)) {
+            startEl.value = parseInt(endEl.value,10) - 30;
+          }
+          syncLabels();
+        });
+
+        endEl.addEventListener("input", () => {
+          if (parseInt(endEl.value,10) <= parseInt(startEl.value,10)) {
+            endEl.value = parseInt(startEl.value,10) + 30;
+          }
+          syncLabels();
+        });
+
+        syncLabels();
+      }
+
+
       function renderMessageInner(msg) {
         const frag = document.createDocumentFragment();
 
@@ -3543,7 +3678,7 @@ window.analyzeLockedSchedule = analyzeLockedSchedule;
           } else if (msg.text) {
             const p = document.createElement("p");
             p.className = "text-[0.85rem] leading-relaxed whitespace-pre-wrap";
-            p.textContent = msg.text;
+            p.innerHTML = renderInlineMarkdown(msg.text);
             frag.appendChild(p);
           }
         } else if (msg.type === "cardsHtml") {
@@ -3604,7 +3739,8 @@ window.analyzeLockedSchedule = analyzeLockedSchedule;
             if (action.icon) {
               const iconSpan = document.createElement("span");
               iconSpan.className = "inline-flex h-5 w-5 items-center justify-center rounded-full bg-sky-100 text-sky-700";
-              iconSpan.innerHTML = `<i class="${action.icon} text-[0.7rem]"></i>`;
+              const iconClass = normalizeFa(action.icon);
+              iconSpan.innerHTML = `<i class="${iconClass} text-[0.7rem]"></i>`;
               btn.appendChild(iconSpan);
             }
             const span = document.createElement("span");
@@ -3613,7 +3749,7 @@ window.analyzeLockedSchedule = analyzeLockedSchedule;
 
             if (action.description && variant === "tile") {
               const desc = document.createElement("span");
-              desc.className = "block text-[0.7rem] text-slate-500 text-left";
+              desc.className = "block text-[0.7rem] text-slate-600 text-left";
               desc.textContent = action.description;
               btn.appendChild(desc);
             }
@@ -3639,7 +3775,7 @@ window.analyzeLockedSchedule = analyzeLockedSchedule;
           "max-w-[90%] md:max-w-[75%] rounded-2xl border shadow-sm px-3 py-2 " +
           (msg.role === "user"
             ? "bg-sky-500 text-white border-sky-500"
-            : "bg-white/90 dark:bg-slate-900/80 text-slate-900 dark:text-slate-50 border-slate-200/70 dark:border-slate-700/70");
+            : "bg-white text-slate-900 border-slate-200/70");
 
         card.appendChild(renderMessageInner(msg));
         wrapper.appendChild(card);
@@ -3832,7 +3968,7 @@ function resetState() {
           { label: "Standard daytime (9am–4pm, Mon–Thu)", value: "time_build_standard" },
           { label: "Morning‑heavy (8am–1pm, Mon–Fri)", value: "time_build_morning" },
           { label: "Afternoons / evenings (12pm–9pm, Mon–Thu)", value: "time_build_evening" },
-          { label: "Use my existing builder settings", value: "time_build_existing" }
+          { label: "Custom time window", value: "time_build_custom" }
         ]);
       }
 
@@ -3874,9 +4010,7 @@ function resetState() {
         resetState();
         pushMessage(
           "assistant",
-          "Hey! I can either help you **build a new schedule** from your advisement sheet or **optimize a schedule you already have**.\n\nWhat would you like to do?",
-          { html: true }
-        );
+          "Hey! I can either help you **build a new schedule** from your advisement sheet or **optimize a schedule you already have**.\n\nWhat would you like to do?");
         setChips([
           {
             label: "Build a schedule",
@@ -4364,15 +4498,84 @@ function handleChip(value) {
             );
             aiChatState.step = "generatedSchedule";
             runScheduleGeneration();
-          } else if (value === "time_build_existing") {
+          } else if (value === "time_build_custom") {
+            aiChatState.step = "awaitCustomTimeWindow";
+            setChips([]);
             pushMessage(
               "assistant",
-              "Okay — I’ll use whatever time settings you’ve already chosen in the Schedule Builder."
+              `
+              <div class="space-y-3">
+                <p class="text-[0.9rem] font-medium text-slate-900">Choose your custom time window:</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <label class="text-xs font-semibold text-slate-600">Start time</label>
+                  <label class="text-xs font-semibold text-slate-600 sm:text-right">End time</label>
+
+                  <div class="flex items-center gap-3">
+                    <input id="customTimeStart" type="range" min="420" max="1320" step="30"
+                      class="w-full accent-sky-500" value="540"/>
+                    <span id="customTimeStartLabel" class="text-sm font-semibold text-slate-900 whitespace-nowrap">9:00 AM</span>
+                  </div>
+
+                  <div class="flex items-center gap-3">
+                    <input id="customTimeEnd" type="range" min="420" max="1320" step="30"
+                      class="w-full accent-sky-500" value="960"/>
+                    <span id="customTimeEndLabel" class="text-sm font-semibold text-slate-900 whitespace-nowrap">4:00 PM</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-end pt-1">
+                  <button data-action-id="time_build_custom_confirm"
+                    class="inline-flex items-center gap-2 rounded-xl bg-sky-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-600">
+                    Use this window
+                  </button>
+                </div>
+              </div>
+              `,
+              { html: true }
+            );
+            attachCustomTimeSlider();
+          }
+        
+        } else if (aiChatState.step === "awaitCustomTimeWindow") {
+          if (value === "time_build_custom_confirm") {
+            const startEl = document.getElementById("customTimeStart");
+            const endEl   = document.getElementById("customTimeEnd");
+            const start = startEl ? parseInt(startEl.value,10) : 540;
+            const end   = endEl ? parseInt(endEl.value,10) : 960;
+
+            if (end <= start) {
+              pushMessage("assistant", "End time has to be after start time. Try adjusting the sliders.");
+              return;
+            }
+
+            try {
+              const days =
+                (typeof timePrefsModel !== "undefined" && timePrefsModel.selectedDays && timePrefsModel.selectedDays.size)
+                  ? Array.from(timePrefsModel.selectedDays)
+                  : ["Mon","Tue","Wed","Thu"];
+
+              if (typeof setSelectedDays === "function") {
+                setSelectedDays(days);
+              } else if (typeof timePrefsModel !== "undefined") {
+                timePrefsModel.selectedDays = new Set(days);
+              }
+
+              if (typeof setDefaultWindow === "function") {
+                setDefaultWindow(start, end);
+              } else if (typeof timePrefsModel !== "undefined") {
+                timePrefsModel.defaultWindow = { start, end };
+              }
+            } catch (e) {}
+
+            pushMessage(
+              "assistant",
+              `Perfect — I’ll build schedules within **${formatMinutesToTime(start)}–${formatMinutesToTime(end)}**.`
             );
             aiChatState.step = "generatedSchedule";
             runScheduleGeneration();
           }
-        } else if (aiChatState.step === "confirmCrns") {
+} else if (aiChatState.step === "confirmCrns") {
           if (value === "crns_ok") {
             aiChatState.step = "confirmOptimizeWindow";
             askForTimePrefsForOptimize();
