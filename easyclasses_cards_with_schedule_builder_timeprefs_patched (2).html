@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Primary Meta Tags -->
+  <meta charset="UTF-8" />
   <title>EasyClasses SJU • Spring 2026 Class Finder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Primary Meta Tags -->
   <meta name="title" content="EasyClasses SJU • Spring 2026 Class Finder" />
-  <meta name="description" content="Browse sections, professor difficulty, and waitlist odds in a friendlier view than Banner, then auto‑build an easier schedule that fits your time preferences." />
+  <meta name="description" content="Browse sections, professor difficulty, and waitlist odds in a friendlier view than Banner, then auto-build an easier schedule that fits your time preferences." />
 
   <!-- Favicon -->
   <link rel="icon" href="https://i.imgur.com/ZhBld9W.png" type="image/png" />
@@ -14,7 +16,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://easyclasses.example.com/" />
   <meta property="og:title" content="EasyClasses SJU • Spring 2026 Class Finder" />
-  <meta property="og:description" content="Browse sections, professor difficulty, and waitlist odds in a friendlier view than Banner, then auto‑build an easier schedule that fits your time preferences." />
+  <meta property="og:description" content="Browse sections, professor difficulty, and waitlist odds in a friendlier view than Banner, then auto-build an easier schedule that fits your time preferences." />
   <meta property="og:image" content="https://i.imgur.com/7WmQ0kb.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -23,12 +25,10 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:url" content="https://easyclasses.example.com/" />
   <meta name="twitter:title" content="EasyClasses SJU • Spring 2026 Class Finder" />
-  <meta name="twitter:description" content="Browse sections, professor difficulty, and waitlist odds in a friendlier view than Banner, then auto‑build an easier schedule that fits your time preferences." />
+  <meta name="twitter:description" content="Browse sections, professor difficulty, and waitlist odds in a friendlier view than Banner, then auto-build an easier schedule that fits your time preferences." />
   <meta name="twitter:image" content="https://i.imgur.com/7WmQ0kb.png" />
 
-  <meta charset="UTF-8" />
-  <title>EasyClasses SJU • Spring 2026 Class Finder</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
 
   <!-- Google Font: Poppins -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,7 +74,53 @@
       color: #f9fafb;
       box-shadow: 0 8px 16px rgba(15, 23, 42, 0.18);
     }
-  </style>
+
+  /* --- AI Chat visibility + custom scrollbars --- */
+
+  /* Stronger heading/subtitle color for AI Chat */
+  [data-page-panel="ai-chat"] h1 {
+    color: #0f172a; /* slate-900 */
+    opacity: 1;
+  }
+  [data-page-panel="ai-chat"] p.ai-chat-subtitle {
+    color: #64748b; /* slate-500/600 */
+    opacity: 1;
+  }
+
+  /* Custom scrollbar for AI chat scroll area (inner only) */
+  
+  .ai-chat-scroll {
+    scrollbar-width: none; /* Firefox: hide scrollbar but keep scroll */
+  }
+  .ai-chat-scroll::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+  .ai-chat-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .ai-chat-scroll::-webkit-scrollbar-thumb {
+    background: transparent;
+  }
+
+/* Hide window scrollbar only in AI Chat mode */
+  html.ai-chat-mode,
+  body.ai-chat-mode {
+    overflow-y: hidden;
+  }
+
+/* Force composer to stay visible in AI Chat */
+body.ai-chat-mode .ai-chat-composer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  background: transparent;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+</style>
 
   <!-- PDF.js for advisement sheet reading -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -83,14 +129,14 @@
       "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
   </script>
 
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body class="min-h-screen bg-gradient-to-b from-slate-50 via-slate-50 to-slate-100 text-slate-900">
-  <!-- Top Navbar -->
-  <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-14 md:h-16 flex items-center justify-between">
-      <!-- Left: Logo + Brand -->
-      <a href="?page=home" class="flex items-center gap-2 group">
-        <div class="h-8 w-8 rounded-xl overflow-hidden ring-1 ring-slate-700/70 shadow-sm">
+    <!-- Sidebar Layout -->
+  <div class="min-h-screen flex">
+    <aside class="w-64 flex flex-col border-r border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 h-screen">
+      <div class="px-4 py-4 flex items-center gap-3 border-b border-slate-800/80">
+        <div class="h-9 w-9 rounded-xl overflow-hidden ring-1 ring-slate-700/70 shadow-sm">
           <img
             src="https://i.imgur.com/ZhBld9W.png"
             alt="EasyClasses logo"
@@ -98,99 +144,69 @@
           />
         </div>
         <div class="flex flex-col">
-          <span class="text-sm font-semibold tracking-tight text-slate-50 group-hover:text-sky-300 transition-colors">
+          <span class="text-sm font-semibold tracking-tight text-slate-50">
             EasyClasses SJU
           </span>
           <span class="text-[11px] text-slate-400">
             Spring 2026 Tools
           </span>
         </div>
-      </a>
+      </div>
 
-      <!-- Center: Nav Links (desktop) -->
-      <nav class="hidden md:flex items-center gap-2 text-sm font-medium">
+      <nav class="flex-1 px-3 py-3 space-y-1 text-sm font-medium">
         <a href="?page=home"
            data-nav="home"
-           class="px-3 py-1.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
-          Home
+           class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-colors">
+          <i class="fa-solid fa-house text-xs opacity-80"></i>
+          <span>Home</span>
         </a>
         <a href="?page=course-search"
            data-nav="course-search"
-           class="px-3 py-1.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
-          Course Search
+           class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-colors">
+          <i class="fa-solid fa-magnifying-glass text-xs opacity-80"></i>
+          <span>Course Search</span>
         </a>
         <a href="?page=schedule-builder"
            data-nav="schedule-builder"
-           class="px-3 py-1.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
-          Schedule Builder
+           class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-colors">
+          <i class="fa-solid fa-calendar-plus text-xs opacity-80"></i>
+          <span>Schedule Builder</span>
         </a>
         <a href="?page=schedule-optimizer"
            data-nav="schedule-optimizer"
-           class="px-3 py-1.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
-          Schedule Optimizer
+           class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-colors">
+          <i class="fa-solid fa-wand-magic-sparkles text-xs opacity-80"></i>
+          <span>Schedule Optimizer</span>
+        </a>
+        <a href="?page=ai-chat"
+           data-nav="ai-chat"
+           class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-colors">
+          <i class="fa-solid fa-comments text-xs opacity-80"></i>
+          <span>AI Chat</span>
         </a>
       </nav>
 
-      <!-- Right: Theme toggle + Prototype pill (desktop) -->
-      <div class="hidden md:flex items-center gap-3">
-        <!-- Existing theme toggle button (moved into navbar) -->
+      <div class="px-3 pb-4 pt-2 border-t border-slate-800/80 space-y-2">
         <button
           id="themeToggle"
-          type="button"
-          class="inline-flex items-center gap-1.5 rounded-full border border-slate-700/80 bg-slate-900/80 px-3 py-1.5 text-xs font-medium text-slate-100 hover:border-sky-400 hover:text-sky-100 transition-colors"
+          class="w-full inline-flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-slate-700/70 bg-slate-900/70 hover:bg-slate-800/80 text-xs text-slate-200 shadow-sm"
         >
-          <span class="icon">
-            <i class="fa-solid fa-moon text-slate-300 text-[0.8rem]"></i>
+          <span class="inline-flex items-center gap-2">
+            <span class="icon inline-flex h-6 w-6 items-center justify-center rounded-lg bg-slate-800/90 border border-slate-600/70">
+              <i class="fa-solid fa-moon text-slate-300 text-[0.75rem]"></i>
+            </span>
+            <span class="label">Dark</span>
           </span>
-          <span class="label">Dark</span>
+          <span class="text-[10px] uppercase tracking-wide text-slate-400">Theme</span>
         </button>
 
-        <span class="inline-flex items-center rounded-full bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-300 border border-amber-500/40">
+        <span class="inline-flex items-center justify-center w-full rounded-full bg-amber-500/10 px-3 py-1.5 text-[11px] font-medium text-amber-300 border border-amber-500/40">
           <span class="w-1.5 h-1.5 rounded-full bg-amber-400 mr-1.5"></span>
           Prototype
         </span>
       </div>
-
-      <!-- Mobile menu button -->
-      <button
-        type="button"
-        class="md:hidden inline-flex items-center justify-center p-2 rounded-full border border-slate-700/70 text-slate-100 hover:bg-white/10 focus:outline-none"
-        aria-label="Open navigation"
-        id="mobileNavToggle"
-      >
-        <i class="fa-solid fa-bars text-sm"></i>
-      </button>
-    </div>
-
-    <!-- Mobile Nav -->
-    <nav
-      id="mobileNav"
-      class="md:hidden hidden border-t border-slate-800/80 bg-slate-950/95 backdrop-blur"
-    >
-      <div class="max-w-6xl mx-auto px-4 py-2 flex flex-col gap-1 text-sm">
-        <a href="?page=home"
-           data-nav="home"
-           class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
-          Home
-        </a>
-        <a href="?page=course-search"
-           data-nav="course-search"
-           class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
-          Course Search
-        </a>
-        <a href="?page=schedule-builder"
-           data-nav="schedule-builder"
-           class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
-          Schedule Builder
-        </a>
-        <a href="?page=schedule-optimizer"
-           data-nav="schedule-optimizer"
-           class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
-          Schedule Optimizer
-        </a>
-      </div>
-    </nav>
-  </header>
+    </aside>
+    <div class="flex-1 flex flex-col">
 
   <!-- hidden utility swatches for Tailwind -->
   <div class="hidden">
@@ -203,7 +219,244 @@
 
   <div class="max-w-6xl mx-auto px-4 py-8 md:py-10 space-y-8">
 
+
+  <!-- HOME PAGE PANEL -->
+  <section data-page-panel="home" class="space-y-10">
+    <!-- Hero -->
+    <div class="bg-slate-950 text-slate-50 rounded-3xl border border-slate-800/60 shadow-md overflow-hidden relative">
+      <div class="absolute inset-0 pointer-events-none opacity-60"
+           style="background: radial-gradient(circle at top left, rgba(56,189,248,0.16), transparent 55%), radial-gradient(circle at bottom right, rgba(129,140,248,0.2), transparent 55%);">
+      </div>
+      <div class="relative px-6 sm:px-8 md:px-10 py-8 md:py-10 flex flex-col md:flex-row md:items-center gap-8">
+        <div class="md:w-3/5 space-y-4">
+          <div class="inline-flex items-center gap-2 rounded-full border border-sky-400/40 bg-slate-900/70 px-3 py-1 text-xs font-medium text-sky-100">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            Live prototype • SJU data helper
+          </div>
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-slate-50">
+            Build a schedule you’ll actually love with <span class="text-sky-300">EasyClasses</span>.
+          </h1>
+          <p class="text-sm sm:text-base text-slate-200/80 max-w-xl">
+            Find classes, compare professors, see waitlist chances, and plan a schedule that fits your life — all in one place.
+          </p>
+
+          <div class="flex flex-wrap gap-3 pt-2">
+            <a href="?page=schedule-builder"
+               data-nav="schedule-builder"
+               class="inline-flex items-center gap-2 rounded-full bg-sky-500 hover:bg-sky-400 text-white text-sm font-medium px-4 py-2.5 shadow-sm shadow-sky-500/40 transition">
+              <i class="fa-solid fa-magic-wand-sparkles text-xs"></i>
+              Build a new schedule
+            </a>
+            <a href="?page=schedule-optimizer"
+               data-nav="schedule-optimizer"
+               class="inline-flex items-center gap-2 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-50 text-sm font-medium px-4 py-2.5 border border-slate-700/80 transition">
+              <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
+              Optimize my current one
+            </a>
+            <a href="?page=course-search"
+               data-nav="course-search"
+               class="inline-flex items-center gap-2 rounded-full bg-slate-900/80 hover:bg-slate-800 text-slate-100 text-xs sm:text-sm font-medium px-3.5 py-2 border border-slate-700/80 transition">
+              <i class="fa-solid fa-magnifying-glass text-xs"></i>
+              Browse all courses
+            </a>
+          </div>
+
+          <div class="pt-3 text-[11px] sm:text-xs text-slate-300/80 leading-snug">
+            EasyClasses is an independent student project for personal planning.
+            It is <span class="font-semibold text-slate-50">not affiliated with, endorsed by, or officially connected</span>
+            to St. John&apos;s University. Always double-check against official SJU systems.
+          </div>
+        </div>
+
+        <div class="md:w-2/5">
+          <div class="bg-slate-900/80 border border-slate-700/80 rounded-2xl px-4 py-4 sm:px-5 sm:py-5 space-y-4 shadow-inner">
+            <p class="text-xs font-medium text-slate-300 uppercase tracking-wide">
+              Live data snapshot
+            </p>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div class="space-y-1">
+                <p class="text-slate-400">Sections loaded</p>
+                <p id="liveTotalSections" class="text-lg font-semibold text-sky-300">–</p>
+              </div>
+              <div class="space-y-1">
+                <p class="text-slate-400">Professors indexed</p>
+                <p id="liveTotalProfs" class="text-lg font-semibold text-emerald-300">–</p>
+              </div>
+              <div class="space-y-1">
+                <p class="text-slate-400">Sections with WL odds</p>
+                <p id="liveWlSections" class="text-lg font-semibold text-violet-300">–</p>
+              </div>
+              <div class="space-y-1">
+                <p class="text-slate-400">Last refreshed</p>
+                <p id="liveUpdatedAt" class="text-[11px] text-slate-200/90 leading-snug">
+                  When data finishes loading
+                </p>
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-snug">
+              Data pulled from SJU course exports + professor rating sources. Estimates only — no guarantees.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tools grid -->
+    <div class="grid gap-4 md:gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div class="bg-white/90 border border-slate-100 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col gap-2">
+        <div class="inline-flex items-center justify-between gap-2">
+          <h2 class="text-sm font-semibold text-slate-900 flex items-center gap-2">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-sky-100 text-sky-600">
+              <i class="fa-solid fa-magnifying-glass text-xs"></i>
+            </span>
+            Course Search
+          </h2>
+          <a href="?page=course-search"
+             data-nav="course-search"
+             class="text-xs font-medium text-sky-600 hover:text-sky-700">
+            Open
+          </a>
+        </div>
+        <p class="text-xs text-slate-600">
+          Filter by subject, campus, difficulty, delivery mode, and waitlist odds. View seat breakdown and meeting details for every section.
+        </p>
+      </div>
+
+      <div class="bg-white/90 border border-slate-100 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col gap-2">
+        <div class="inline-flex items-center justify-between gap-2">
+          <h2 class="text-sm font-semibold text-slate-900 flex items-center gap-2">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-emerald-100 text-emerald-600">
+              <i class="fa-solid fa-file-lines text-xs"></i>
+            </span>
+            Advisement PDF Parser
+          </h2>
+          <a href="?page=schedule-builder"
+             data-nav="schedule-builder"
+             class="text-xs font-medium text-sky-600 hover:text-sky-700">
+            Open
+          </a>
+        </div>
+        <p class="text-xs text-slate-600">
+          Upload your advisement sheet and extract the course numbers you still need. No manual typing required.
+        </p>
+      </div>
+
+      <div class="bg-white/90 border border-slate-100 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col gap-2">
+        <div class="inline-flex items-center justify-between gap-2">
+          <h2 class="text-sm font-semibold text-slate-900 flex items-center gap-2">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-indigo-100 text-indigo-600">
+              <i class="fa-solid fa-calendar-days text-xs"></i>
+            </span>
+            Time Preference Builder
+          </h2>
+          <a href="?page=schedule-builder"
+             data-nav="schedule-builder"
+             class="text-xs font-medium text-sky-600 hover:text-sky-700">
+            Open
+          </a>
+        </div>
+        <p class="text-xs text-slate-600">
+          Choose which days and time windows you want classes. We convert it into a machine-readable grid for schedule generation.
+        </p>
+      </div>
+
+      <div class="bg-white/90 border border-slate-100 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col gap-2">
+        <div class="inline-flex items-center justify-between gap-2">
+          <h2 class="text-sm font-semibold text-slate-900 flex items-center gap-2">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-violet-100 text-violet-600">
+              <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
+            </span>
+            Schedule Optimizer
+          </h2>
+          <a href="?page=schedule-optimizer"
+             data-nav="schedule-optimizer"
+             class="text-xs font-medium text-sky-600 hover:text-sky-700">
+            Open
+          </a>
+        </div>
+        <p class="text-xs text-slate-600">
+          Paste or upload a screenshot of your current schedule. We extract CRNs, compare difficulty, and suggest easier or safer alternatives.
+        </p>
+      </div>
+
+      <div class="bg-white/90 border border-slate-100 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col gap-2">
+        <div class="inline-flex items-center justify-between gap-2">
+          <h2 class="text-sm font-semibold text-slate-900 flex items-center gap-2">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-amber-100 text-amber-600">
+              <i class="fa-solid fa-face-smile-beam text-xs"></i>
+            </span>
+            Professor Difficulty Engine
+          </h2>
+          <span class="text-[11px] font-medium text-amber-700 bg-amber-50 rounded-full px-2 py-0.5 border border-amber-100">
+            Uses RMP-style stats
+          </span>
+        </div>
+        <p class="text-xs text-slate-600">
+          Difficulty labels, would-take-again percentages, and rating counts are baked directly into every section card.
+        </p>
+      </div>
+
+      <div class="bg-white/90 border border-slate-100 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col gap-2">
+        <div class="inline-flex items-center justify-between gap-2">
+          <h2 class="text-sm font-semibold text-slate-900 flex items-center gap-2">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-rose-100 text-rose-600">
+              <i class="fa-solid fa-chart-line text-xs"></i>
+            </span>
+            Waitlist Probability Model
+          </h2>
+          <span class="text-[11px] font-medium text-rose-700 bg-rose-50 rounded-full px-2 py-0.5 border border-rose-100">
+            Experimental
+          </span>
+        </div>
+        <p class="text-xs text-slate-600">
+          We estimate how likely additional seats are to open before add/drop using a simple Poisson-style model. Helpful signal, not a promise.
+        </p>
+      </div>
+    </div>
+
+    <!-- How it works -->
+    <div class="bg-white/90 border border-slate-100 rounded-3xl p-5 sm:p-6 lg:p-7 shadow-sm space-y-4">
+      <p class="text-xs font-semibold text-sky-700 uppercase tracking-wide">
+        How EasyClasses fits into your semester
+      </p>
+      <div class="grid gap-4 md:grid-cols-3 text-xs">
+        <div class="space-y-1.5">
+          <p class="text-[11px] font-semibold text-slate-800 flex items-center gap-1.5 uppercase tracking-wide">
+            <span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-slate-900 text-slate-50 text-[10px]">1</span>
+            Import what you&apos;re working with
+          </p>
+          <p class="text-slate-600">
+            Add your advisement sheet, a screenshot of your schedule, or simply start browsing classes.
+          </p>
+        </div>
+        <div class="space-y-1.5">
+          <p class="text-[11px] font-semibold text-slate-800 flex items-center gap-1.5 uppercase tracking-wide">
+            <span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-slate-900 text-slate-50 text-[10px]">2</span>
+            Tell us your constraints
+          </p>
+          <p class="text-slate-600">
+            Choose the days, times, campuses, and difficulty levels you prefer. We’ll show it as a simple week view that’s easy to understand.
+          </p>
+        </div>
+        <div class="space-y-1.5">
+          <p class="text-[11px] font-semibold text-slate-800 flex items-center gap-1.5 uppercase tracking-wide">
+            <span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-slate-900 text-slate-50 text-[10px]">3</span>
+            Explore smarter schedules
+          </p>
+          <p class="text-slate-600">
+            Use Course Search, the Builder, and the Optimizer together to find schedules that are realistic <em>and</em> low-stress.
+          </p>
+        </div>
+      </div>
+
+      <div class="pt-1 text-[11px] text-slate-500">
+        This tool is for personal exploration and planning. Final decisions should rely on official university sources like UIS/Banner and your academic advisor.
+      </div>
+    </div>
+  </section>
+
   <!-- COURSE SEARCH PAGE PANEL -->
+
   <section data-page-panel="course-search" class="space-y-4">
     <!-- PAGE HEADER -->
     <header class="mb-6">
@@ -211,7 +464,7 @@
         EasyClasses SJU • Spring 2026
       </h1>
       <p class="text-sm md:text-[0.9rem] text-slate-500 mt-1">
-        Browse sections, professor difficulty, and waitlist odds in a friendlier view than Banner.
+        Search by subject, campus, or instructor and see difficulty, workload, seats, and waitlist chances in one clean view.
       </p>
     </header>
 
@@ -317,7 +570,7 @@
         Schedule Builder
       </h1>
       <p class="text-sm md:text-[0.9rem] text-slate-500 mt-1">
-        Upload your advisement sheet (PDF). We’ll scan the “Part 2” section and pull out the courses you need.
+        Upload your advisement sheet (PDF). We’ll read your course list for you — no manual typing.
       </p>
     </header>
 
@@ -361,7 +614,7 @@
             class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-medium text-slate-700 hover:border-sky-400 hover:text-sky-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
             <i class="fa-solid fa-wand-magic-sparkles text-[0.8rem]"></i>
-            <span>Extract courses</span>
+            <span>Find my classes</span>
           </button>
 
           <p class="text-[0.7rem] text-slate-400">
@@ -614,10 +867,206 @@
     </div>
 
   </section>
+  <!-- SCHEDULE OPTIMIZER PAGE PANEL -->
+  <section data-page-panel="schedule-optimizer" class="space-y-5 hidden">
+
+    <header class="mb-3">
+      <h1 class="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900">
+        Schedule Optimizer
+      </h1>
+      <p class="text-sm md:text-[0.9rem] text-slate-500 mt-1">
+        Upload, paste, or drag-and-drop an image of your current schedule. We’ll read it and suggest easier swaps.
+      </p>
+    </header>
+
+    <div class="grid gap-5 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+      <!-- Left: upload / paste -->
+      <div class="bg-white/90 backdrop-blur rounded-3xl shadow-sm border border-slate-100 p-4 md:p-5 space-y-4">
+        <h2 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+          <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 text-xs">
+            <i class="fa-regular fa-image"></i>
+          </span>
+          Add your schedule image
+        </h2>
+
+        <!-- Dropzone -->
+        <label
+          id="optimizerDropzone"
+          class="relative group cursor-pointer rounded-2xl border-2 border-dashed border-slate-200 hover:border-sky-300 bg-slate-50/60 p-6 md:p-8 flex flex-col items-center justify-center text-center transition"
+        >
+          <input
+            id="optimizerFileInput"
+            type="file"
+            accept="image/*"
+            class="absolute inset-0 opacity-0 cursor-pointer"
+          />
+          <div class="flex flex-col items-center gap-2">
+            <div class="h-12 w-12 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-600 group-hover:text-sky-600 transition">
+              <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+            </div>
+            <p class="font-medium text-slate-800">
+              Drag &amp; drop your schedule here
+            </p>
+            <p class="text-xs text-slate-500">
+              or click to upload • PNG, JPG, HEIC, etc.
+            </p>
+          </div>
+        </label>
+
+        <!-- Paste shortcut -->
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+          <button
+            id="optimizerPasteBtn"
+            type="button"
+            class="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-800 transition"
+          >
+            <i class="fa-regular fa-clipboard"></i>
+            Paste from clipboard
+          </button>
+          <p class="text-xs text-slate-500">
+            Tip: you can also press <span class="font-semibold">Ctrl/Cmd + V</span> anywhere on this page.
+          </p>
+        </div>
+
+        <!-- Optional notes (future use) -->
+        <textarea
+          id="optimizerNotes"
+          rows="4"
+          placeholder="Optional: add notes about your schedule (e.g., days you can’t attend, preferred times)."
+          class="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
+        ></textarea>
+
+        <p class="text-[0.7rem] text-slate-400">
+          We only use your image to read class times and suggest easier alternatives. Nothing is stored.
+        </p>
+      </div>
+
+      <!-- Right: preview -->
+      <div class="bg-white/90 backdrop-blur rounded-3xl shadow-sm border border-slate-100 p-4 md:p-5 space-y-3">
+        <h2 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+          <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-sky-50 text-sky-600 text-xs">
+            <i class="fa-solid fa-eye"></i>
+          </span>
+          Preview
+        </h2>
+
+        <div
+          id="optimizerPreview"
+          class="w-full aspect-[4/3] rounded-2xl border border-slate-100 bg-slate-50 flex items-center justify-center text-slate-400 text-sm"
+        >
+          No image yet.
+        </div>
+<div class="flex items-start gap-2 text-xs text-slate-500">
+          <i class="fa-solid fa-wand-magic-sparkles mt-0.5 text-slate-400"></i>
+          <p>
+            Once uploaded, we’ll detect your classes and meeting patterns, score difficulty, and recommend easier swaps.
+          </p>
+        </div>
+      </div>
+
+<!-- Detected CRNs + Lock button -->
+<div class="bg-white/90 backdrop-blur rounded-3xl shadow-sm border border-slate-100 p-4 md:p-5 space-y-3">
+  <div class="flex items-center justify-between">
+    <h2 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+      <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 text-xs">
+        <i class="fa-solid fa-hashtag"></i>
+      </span>
+      Detected CRNs
+    </h2>
+
+    <button id="lockCrnsBtn"
+      class="inline-flex items-center gap-2 rounded-full bg-slate-900 text-white text-xs font-semibold px-4 py-2 shadow-sm hover:bg-slate-800 disabled:opacity-60 disabled:cursor-not-allowed transition"
+      disabled>
+      <i class="fa-solid fa-lock text-[0.8rem]"></i>
+      Lock & Analyze
+    </button>
+  </div>
+
+  <div id="optimizerCrnResults" class="text-[0.8rem] text-slate-700">
+    No CRNs detected yet.
+  </div>
+
+  <div id="optimizerRecommendations" class="text-[0.8rem] text-slate-700 space-y-2"></div>
+</div>
+
+    </div>
+
+  </section>
+
+  
+<!-- AI CHAT PAGE PANEL -->
+  <section data-page-panel="ai-chat" class="hidden h-[calc(100vh-4.5rem)] flex flex-col bg-slate-50 md:bg-gradient-to-b md:from-slate-50 md:to-slate-100 dark:bg-slate-950 -mx-4 md:mx-0 overflow-hidden">
+    <div class="flex-1 flex flex-col h-full">
+      <!-- Scrollable header + chat -->
+      <div class="flex-1 min-h-0 overflow-y-auto ai-chat-scroll">
+        <div class="px-4 md:px-0">
+          <div class="mx-auto w-full max-w-3xl px-2 md:px-4 pb-44 space-y-6">
+            <header class="pt-10 pb-6 text-center px-4 md:px-0">
+                    <div class="mx-auto mb-3 h-10 w-10 rounded-2xl bg-sky-500/10 flex items-center justify-center">
+                      <i class="fa-solid fa-sparkles text-sky-500"></i>
+                    </div>
+                    <h1 class="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+                      AI Schedule Assistant
+                    </h1>
+                    <p class="mt-1 text-sm md:text-[0.95rem] text-slate-600 dark:text-slate-300 ai-chat-subtitle">
+                      Effortless help building or optimizing your schedule.
+                    </p>
+                  </header>
+            <div id="aiChatMessages" class="space-y-4">
+              <!-- Messages injected by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sticky composer -->
+      <div class="sticky bottom-0 left-0 right-0 bg-transparent ai-chat-composer">
+              <div class="mx-auto w-full max-w-3xl px-4 pb-4 pt-0 space-y-3">
+                <div id="aiChatChips" class="flex flex-wrap gap-3">
+                  <!-- Chips injected by JS -->
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <button id="aiChatUploadBtn" type="button"
+                    class="inline-flex items-center gap-2 px-3 h-11 rounded-2xl border border-slate-200 bg-white text-slate-700 hover:border-sky-400 hover:bg-sky-50 text-sm shadow-sm">
+                    <i class="fa-regular fa-paperclip"></i>
+                    <span>Upload</span>
+                  </button>
+                  <input id="aiChatFileInput" type="file" class="hidden" />
+
+                  <div class="flex-1 flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 h-11 shadow-sm">
+                    <input
+                      id="aiChatInput"
+                      type="text"
+                      class="flex-1 text-[0.9rem] bg-transparent text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                      placeholder="Type a message..." />
+                    <button
+                      id="aiChatSendBtn"
+                      type="button"
+                      class="inline-flex items-center justify-center px-4 h-9 rounded-full bg-sky-500 text-white text-sm font-medium hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-500/60">
+                      Send
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+    
+
+    </div>
+
+  </section>
 
 </div>
 
-  <script>
+
+  
+    </div>
+  </div>
+
+<script>
+    // === Shared config & state ===
+
     const SUBJECTS_API = "https://sheet2api.com/v1/ZPeTNTUrSFuL/all_subjects_spring_2026";
     const PROFS_API    = "https://sheet2api.com/v1/ZPeTNTUrSFuL/professor_ratings";
     const SUBJECT_ABBREV_API = "https://sheet2api.com/v1/ZPeTNTUrSFuL/subjects-abbreviations";
@@ -634,14 +1083,18 @@
 
     
     // SPA-style nav + deeplinks
+    
+    
     function setActivePage(page) {
-      // highlight nav
+      // highlight nav: only toggle active styles, don't override theme colors
       document.querySelectorAll("[data-nav]").forEach(link => {
         const linkPage = link.getAttribute("data-nav");
         const isActive = linkPage === page;
         link.classList.toggle("bg-sky-500/90", isActive);
         link.classList.toggle("text-white", isActive);
-        link.classList.toggle("text-slate-300", !isActive);
+        if (!isActive) {
+          link.classList.remove("bg-sky-500/90", "text-white");
+        }
       });
 
       // show the correct page panel
@@ -649,18 +1102,29 @@
         const name = panel.getAttribute("data-page-panel");
         panel.classList.toggle("hidden", name !== page);
       });
+    
+// 🧠 Special case: AI Chat = no window scrollbar
+const isAiChat = page === "ai-chat";
+document.documentElement.classList.toggle("ai-chat-mode", isAiChat);
+document.body.classList.toggle("ai-chat-mode", isAiChat);
+
     }
+
+
+
+    
+    // === SPA Navigation (query param based) ===
 
     function initSpaNav() {
       const urlParams = new URLSearchParams(window.location.search);
-      const initialPage = urlParams.get("page") || "course-search";
+      const initialPage = urlParams.get("page") || "home";
       setActivePage(initialPage);
 
       // intercept nav clicks
       document.querySelectorAll("[data-nav]").forEach(link => {
         link.addEventListener("click", (e) => {
           e.preventDefault();
-          const page = link.getAttribute("data-nav") || "course-search";
+          const page = link.getAttribute("data-nav") || "home";
           const url = new URL(window.location.href);
           url.searchParams.set("page", page);
           window.history.pushState({ page }, "", url);
@@ -672,7 +1136,7 @@
       window.addEventListener("popstate", (event) => {
         const statePage = event.state && event.state.page;
         const url = new URL(window.location.href);
-        const page = statePage || url.searchParams.get("page") || "course-search";
+        const page = statePage || url.searchParams.get("page") || "home";
         setActivePage(page);
       });
 
@@ -948,25 +1412,36 @@ let activeDifficulty = "";
       return { label, percent: Math.round(p * 100) };
     }
 
+    
+    const DIFFICULTY_BADGE_MAP = {
+      "Easy":        "bg-emerald-50 text-emerald-700 border border-emerald-100",
+      "Moderate":    "bg-amber-50 text-amber-700 border border-amber-100",
+      "Challenging": "bg-violet-50 text-violet-700 border border-violet-100",
+      "Demanding":   "bg-rose-50 text-rose-700 border border-rose-100",
+    };
+
     function getDifficultyBadgeClasses(label) {
-      switch (label) {
-        case "Easy":        return "bg-emerald-50 text-emerald-700 border border-emerald-100";
-        case "Moderate":    return "bg-amber-50 text-amber-700 border border-amber-100";
-        case "Challenging": return "bg-violet-50 text-violet-700 border border-violet-100";
-        case "Demanding":   return "bg-rose-50 text-rose-700 border border-rose-100";
-        default:            return "bg-slate-100 text-slate-700 border border-slate-200";
-      }
+      return (
+        DIFFICULTY_BADGE_MAP[label] ||
+        "bg-slate-100 text-slate-700 border border-slate-200"
+      );
     }
 
+
+    const WL_BADGE_MAP = {
+      "Very High": "bg-emerald-100 text-emerald-800 border border-emerald-200",
+      "High":      "bg-emerald-50 text-emerald-700 border border-emerald-100",
+      "Moderate":  "bg-amber-50 text-amber-700 border border-amber-100",
+      "Low":       "bg-rose-50 text-rose-700 border border-rose-100",
+    };
+
     function getWaitlistBadgeClasses(label) {
-      switch (label) {
-        case "Very High": return "bg-emerald-100 text-emerald-800 border border-emerald-200";
-        case "High":      return "bg-emerald-50 text-emerald-700 border border-emerald-100";
-        case "Moderate":  return "bg-amber-50 text-amber-700 border border-amber-100";
-        case "Low":       return "bg-rose-50 text-rose-700 border border-rose-100";
-        default:          return "bg-slate-100 text-slate-700 border border-slate-200";
-      }
+      return (
+        WL_BADGE_MAP[label] ||
+        "bg-slate-100 text-slate-700 border border-slate-200"
+      );
     }
+
 
     function getWaitlistTooltip(label) {
       switch (label) {
@@ -1202,6 +1677,39 @@ let activeDifficulty = "";
 
           return String(a.crn || "").localeCompare(String(b.crn || ""));
         });
+
+        // Update homepage live stats, if present
+        try {
+          const liveTotalSectionsEl = document.getElementById("liveTotalSections");
+          const liveTotalProfsEl    = document.getElementById("liveTotalProfs");
+          const liveWlSectionsEl    = document.getElementById("liveWlSections");
+          const liveUpdatedAtEl     = document.getElementById("liveUpdatedAt");
+
+          if (liveTotalSectionsEl) {
+            liveTotalSectionsEl.textContent = (sections || []).length.toLocaleString();
+          }
+          if (liveTotalProfsEl) {
+            const profCount = Object.keys(profMap || {}).length;
+            liveTotalProfsEl.textContent = profCount.toLocaleString();
+          }
+          if (liveWlSectionsEl) {
+            const wlCount = (sections || []).filter(s => s && s.wlChance && s.wlChance.label).length;
+            liveWlSectionsEl.textContent = wlCount.toLocaleString();
+          }
+          if (liveUpdatedAtEl) {
+            const now = new Date();
+            liveUpdatedAtEl.textContent = now.toLocaleString(undefined, {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+              hour: "numeric",
+              minute: "2-digit"
+            });
+          }
+        } catch (e) {
+          console.warn("Failed to update homepage live stats:", e);
+        }
+
 
         dataLoaded = true;
         populateFilters();
@@ -1504,7 +2012,9 @@ let activeDifficulty = "";
     });
 
     
-    // === PDF course extraction helpers ===
+    
+    // === Advisement PDF parsing (Schedule Builder) ===
+// === PDF course extraction helpers ===
     function fileToArrayBuffer(file) {
       return file.arrayBuffer();
     }
@@ -1762,7 +2272,7 @@ let activeDifficulty = "";
         } finally {
           builderRunBtn.disabled = !builderSelectedFile;
           builderRunBtn.innerHTML =
-            '<i class="fa-solid fa-wand-magic-sparkles text-[0.8rem]"></i><span>Extract courses</span>';
+            '<i class="fa-solid fa-wand-magic-sparkles text-[0.8rem]"></i><span>Find my classes</span>';
         }
 
       });
@@ -1943,6 +2453,9 @@ let activeDifficulty = "";
       }
       return summary;
     }
+
+    
+    // === Time Preference Builder (Schedule Builder) ===
 
     function initTimePrefsUI() {
       const dayButtons = document.querySelectorAll(".time-day-pill");
@@ -2352,11 +2865,1654 @@ let activeDifficulty = "";
       scheduleOptionsContainer.innerHTML = lines.join("");
     }
 
+
+    // === Schedule Optimizer page wiring ===
+    
+  // ===============================
+  // OCR TABLE RECONSTRUCTION (GUIDE-BASED)
+  // ===============================
+  async function extractTableFromImage(fileOrBlob, colPct = 5, rowPct = 3) {
+    // 1) OCR words from Tesseract
+    const { data } = await Tesseract.recognize(fileOrBlob, "eng", {
+      logger: (m) => console.log("[OCR]", m),
+    });
+
+    let words = (data.words || []).filter((w) => (w.text || "").trim().length > 0);
+
+    // 2) Normalize words (cx, cy)
+    words = words.map((w) => ({
+      ...w,
+      cx: (w.bbox.x0 + w.bbox.x1) / 2,
+      cy: (w.bbox.y0 + w.bbox.y1) / 2,
+    }));
+
+    if (!words.length) return [];
+
+    // 3) Estimate image size from bboxes
+    const imageWidth = Math.max(...words.map((w) => w.bbox.x1));
+    const imageHeight = Math.max(...words.map((w) => w.bbox.y1));
+
+    // 4) Convert threshold percentages to pixels
+    const colThreshold = (colPct / 100) * imageWidth;
+    const rowThreshold = (rowPct / 100) * imageHeight;
+
+    // 5) Cluster columns (sweep on cx)
+    const sortedX = [...words].sort((a, b) => a.cx - b.cx);
+    const colCenters = [];
+    sortedX.forEach((w) => {
+      const last = colCenters[colCenters.length - 1];
+      if (!last || Math.abs(w.cx - last) > colThreshold) colCenters.push(w.cx);
+      else {
+        const i = colCenters.length - 1;
+        colCenters[i] = (colCenters[i] + w.cx) / 2;
+      }
+    });
+
+    // Assign nearest column to each word
+    words.forEach((w) => {
+      let best = 0,
+        dist = Infinity;
+      colCenters.forEach((c, i) => {
+        const d = Math.abs(w.cx - c);
+        if (d < dist) {
+          dist = d;
+          best = i;
+        }
+      });
+      w.col = best;
+    });
+
+    // 6) Cluster rows (sweep on cy)
+    const sortedY = [...words].sort((a, b) => a.cy - b.cy);
+    const rowCenters = [];
+    sortedY.forEach((w) => {
+      const last = rowCenters[rowCenters.length - 1];
+      if (!last || Math.abs(w.cy - last) > rowThreshold) rowCenters.push(w.cy);
+      else {
+        const i = rowCenters.length - 1;
+        rowCenters[i] = (rowCenters[i] + w.cy) / 2;
+      }
+    });
+
+    // Assign nearest row to each word
+    words.forEach((w) => {
+      let best = 0,
+        dist = Infinity;
+      rowCenters.forEach((r, i) => {
+        const d = Math.abs(w.cy - r);
+        if (d < dist) {
+          dist = d;
+          best = i;
+        }
+      });
+      w.row = best;
+    });
+
+    // 7) Build the 2D cell matrix
+    const rowCount = rowCenters.length;
+    const colCount = colCenters.length;
+
+    const cells = Array.from({ length: rowCount }, () =>
+      Array.from({ length: colCount }, () => "")
+    );
+
+    words.forEach((w) => {
+      const r = w.row,
+        c = w.col;
+      if (!cells[r][c]) cells[r][c] = w.text;
+      else cells[r][c] += " " + w.text;
+    });
+
+    return cells;
+  }
+
+  // ===============================
+  // CRN COLUMN DETECTION + EXTRACTION
+  // ===============================
+  function detectHeaderRowIndex(cells) {
+    let bestIdx = 0,
+      bestScore = -1;
+    const scanRows = Math.min(3, cells.length);
+
+    for (let r = 0; r < scanRows; r++) {
+      const rowText = (cells[r] || []).join(" ").toLowerCase();
+      const score =
+        (rowText.includes("crn") ? 3 : 0) +
+        (rowText.includes("course") ? 1 : 0) +
+        (rowText.includes("section") || rowText.includes("sec") ? 1 : 0);
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestIdx = r;
+      }
+    }
+    return bestIdx;
+  }
+
+  function findCrnColumnIndex(cells, headerRowIdx) {
+    const header = cells[headerRowIdx] || [];
+    let crnCol = header.findIndex((cell) => /crn/i.test(cell || ""));
+
+    if (crnCol !== -1) return crnCol;
+
+    // Fallback: pick the column with the most CRN-looking numbers under it
+    let bestCol = -1,
+      bestHits = -1;
+    const colCount = header.length;
+
+    for (let c = 0; c < colCount; c++) {
+      let hits = 0;
+      for (let r = headerRowIdx + 1; r < cells.length; r++) {
+        const v = String((cells[r] || [])[c] || "");
+        if (/\b\d{4,6}\b/.test(v)) hits++;
+      }
+      if (hits > bestHits) {
+        bestHits = hits;
+        bestCol = c;
+      }
+    }
+
+    return bestCol;
+  }
+
+  function extractCrnsFromCells(cells) {
+    if (!cells || !cells.length) return [];
+
+    const headerRowIdx = detectHeaderRowIndex(cells);
+    const crnCol = findCrnColumnIndex(cells, headerRowIdx);
+    if (crnCol === -1) return [];
+
+    const crns = [];
+    for (let r = headerRowIdx + 1; r < cells.length; r++) {
+      const raw = String((cells[r] || [])[crnCol] || "").trim();
+      const match = raw.match(/\b\d{4,6}\b/);
+      if (match) crns.push(match[0]);
+    }
+
+    return [...new Set(crns)];
+  }
+
+  function renderCrnResults(crns, container) {
+  if (!container) return;
+  if (!crns.length) {
+    container.innerHTML = `<div class="text-slate-500 text-xs">No CRNs detected yet.</div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="font-semibold mb-1">Detected CRNs (${crns.length})</div>
+    <ul class="list-disc pl-5 space-y-1">
+      ${crns.map((c) => `<li>${c}</li>`).join("")}
+    </ul>
+  `;
+}
+
+
+// ===============================
+// OPTIMIZER: LOCK CRNs -> FIND EASIER SWAPS
+
+// ===============================
+function getRegisteredSectionsFromCrns(crns) {
+  const set = new Set((crns || []).map((c) => String(c).trim()));
+  const liveSections =
+    (window.sections && window.sections.length)
+      ? window.sections
+      : (typeof sections !== "undefined" ? sections : []);
+  return liveSections.filter((sec) => set.has(String(sec.crn).trim()));
+}
+
+function inferTimeWindow(registeredSections) {
+  const windowByDay = {};
+  registeredSections.forEach((sec) => {
+    (sec.timeSlots || []).forEach((ts) => {
+      const day = ts.day;
+      if (!windowByDay[day]) {
+        windowByDay[day] = { startMin: ts.startMin, endMin: ts.endMin };
+      } else {
+        windowByDay[day].startMin = Math.min(windowByDay[day].startMin, ts.startMin);
+        windowByDay[day].endMin = Math.max(windowByDay[day].endMin, ts.endMin);
+      }
+    });
+  });
+  return windowByDay;
+}
+
+function isWithinWindow(section, windowByDay) {
+  const slots = section.timeSlots || [];
+  if (!slots.length) return false;
+  return slots.every((ts) => {
+    const w = windowByDay[ts.day];
+    if (!w) return false;
+    return ts.startMin >= w.startMin && ts.endMin <= w.endMin;
+  });
+}
+
+function findEasierAlternatives(currentSec, windowByDay) {
+  const map = (window.sectionsByCourseKey && window.sectionsByCourseKey.size) ? window.sectionsByCourseKey : (typeof sectionsByCourseKey !== 'undefined' ? sectionsByCourseKey : null);
+  const pool = map && map.get ? (map.get(currentSec.courseKey) || []) : [];
+  return pool
+    .filter((s) => String(s.crn) !== String(currentSec.crn))
+    .filter((s) => isWithinWindow(s, windowByDay))
+    .filter((s) => (s.difficultyPercent ?? 100) < (currentSec.difficultyPercent ?? 100))
+    .sort((a, b) => (a.difficultyPercent ?? 0) - (b.difficultyPercent ?? 0));
+}
+
+function categorizeSwaps(alts) {
+  const available = [];
+  const waitlist = [];
+  alts.forEach((s) => {
+    if (!s.isFull && (s.seatsRem ?? 0) > 0) available.push(s);
+    else if (s.wlChance && (s.wlChance.label === "High" || s.wlChance.label === "Very High")) {
+      waitlist.push(s);
+    }
+  });
+  return { available, waitlist };
+}
+
+function formatMin(mins) {
+  const h24 = Math.floor(mins / 60);
+  const m = mins % 60;
+  const ampm = h24 >= 12 ? "PM" : "AM";
+  const h12 = ((h24 + 11) % 12) + 1;
+  return `${h12}:${String(m).padStart(2, "0")} ${ampm}`;
+}
+
+function summarizeWindow(windowByDay) {
+  const order = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const parts = [];
+  order.forEach((d) => {
+    if (windowByDay[d]) {
+      parts.push(`${d} ${formatMin(windowByDay[d].startMin)}–${formatMin(windowByDay[d].endMin)}`);
+    }
+  });
+  return parts.join(", ");
+}
+
+function renderOptimizerRecommendations(results, windowByDay) {
+  const holder = document.getElementById("optimizerRecommendations");
+  if (!holder) return;
+
+  if (!results.length) {
+    holder.innerHTML = `<div class="text-slate-500">No matching registered courses found for those CRNs.</div>`;
+    return;
+  }
+
+  const windowText = summarizeWindow(windowByDay);
+  holder.innerHTML = `
+    <div class="mt-2 text-xs text-slate-500">Inferred target window: ${windowText || "—"}</div>
+    <div class="mt-3 space-y-3">
+      ${results.map((r) => {
+        const cur = r.current;
+        const avail = r.available.slice(0, 3);
+        const wl = r.waitlist.slice(0, 3);
+
+        const availHtml = avail.length
+          ? avail.map((s) => `
+              <li class="flex items-center justify-between gap-2">
+                <span>${s.courseKey} · CRN ${s.crn} · ${s.meetingDays} ${s.meetingTime}</span>
+                <span class="text-emerald-700 font-semibold">${s.difficultyLabel || "Easier"}</span>
+              </li>
+            `).join("")
+          : `<li class="text-slate-500">No easier open sections in-window.</li>`;
+
+        const wlHtml = wl.length
+          ? wl.map((s) => `
+              <li class="flex items-center justify-between gap-2">
+                <span>${s.courseKey} · CRN ${s.crn} · ${s.meetingDays} ${s.meetingTime}</span>
+                <span class="text-indigo-700 font-semibold">Waitlist ${s.wlChance.percent}% (${s.wlChance.label})</span>
+              </li>
+            `).join("")
+          : `<li class="text-slate-500">No strong waitlist options in-window.</li>`;
+
+        return `
+          <div class="rounded-2xl border border-slate-200/70 bg-white p-3">
+            <div class="text-sm font-semibold text-slate-800">${cur.courseKey} · Current CRN ${cur.crn}</div>
+            <div class="text-xs text-slate-500 mt-0.5">${cur.meetingDays} ${cur.meetingTime} · ${cur.instructor || "TBA"} · ${cur.difficultyLabel || "—"}</div>
+
+            <div class="mt-2 text-xs font-semibold text-slate-700">Easier open swaps</div>
+            <ul class="mt-1 text-xs list-disc pl-5 space-y-1">${availHtml}</ul>
+
+            <div class="mt-2 text-xs font-semibold text-slate-700">High‑chance waitlist swaps</div>
+            <ul class="mt-1 text-xs list-disc pl-5 space-y-1">${wlHtml}</ul>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+async function analyzeLockedSchedule(crns) {
+  // Ensure core data exists
+  if (!window.dataLoaded) await window.loadData();
+
+  const registeredSecs = getRegisteredSectionsFromCrns(crns);
+  const windowByDay = inferTimeWindow(registeredSecs);
+
+  const results = registeredSecs.map((cur) => {
+    const alts = findEasierAlternatives(cur, windowByDay);
+    const { available, waitlist } = categorizeSwaps(alts);
+    return { current: cur, available, waitlist };
+  });
+
+  renderOptimizerRecommendations(results, windowByDay);
+
+  // Build a lightweight summary for AI Chat (safe to ignore by UI callers)
+  const diffPercents = registeredSecs
+    .map(s => (s.difficultyBucket && typeof s.difficultyBucket.percent === "number") ? s.difficultyBucket.percent : null)
+    .filter(v => v != null);
+  const avgDiff = diffPercents.length
+    ? diffPercents.reduce((a,b)=>a+b,0) / diffPercents.length
+    : null;
+
+  let diffLabel = "Unknown";
+  if (avgDiff != null) {
+    diffLabel = avgDiff >= 75 ? "Demanding"
+      : avgDiff >= 55 ? "Challenging"
+      : avgDiff >= 35 ? "Moderate"
+      : "Easy";
+  }
+
+  const wlCounts = {};
+  registeredSecs.forEach(s => {
+    const bucket = s.wlEstimate?.bucket || "Unknown";
+    wlCounts[bucket] = (wlCounts[bucket] || 0) + 1;
+  });
+
+  const swapCounts = results.reduce((acc, r) => {
+    acc.available += (r.available || []).length;
+    acc.waitlist += (r.waitlist || []).length;
+    return acc;
+  }, { available: 0, waitlist: 0 });
+
+  return {
+    registeredSecs,
+    windowByDay,
+    results,
+    summary: {
+      avgDiffPercent: avgDiff,
+      avgDiffLabel: diffLabel,
+      wlCounts,
+      swapCounts
+    }
+  };
+}
+
+// Expose analyzer globally for AI Chat + Optimizer
+window.analyzeLockedSchedule = analyzeLockedSchedule;
+
+
+
+// Expose for optimizer click handler
+
+
+
+  function initScheduleOptimizer() {
+  const fileInput  = document.getElementById("optimizerFileInput");
+  const dropzone   = document.getElementById("optimizerDropzone");
+  const pasteBtn   = document.getElementById("optimizerPasteBtn");
+  const previewBox = document.getElementById("optimizerPreview");
+  const crnResults = document.getElementById("optimizerCrnResults");
+  const lockBtn    = document.getElementById("lockCrnsBtn");
+
+  if (!fileInput || !dropzone || !pasteBtn || !previewBox) {
+    return;
+  }
+
+  let detectedCrns = [];
+
+  function showMessage(msg) {
+    previewBox.innerHTML = `
+      <div class="text-[0.8rem] text-slate-500 text-center px-4 py-8">
+        ${msg}
+      </div>
+    `;
+    if (crnResults) crnResults.innerHTML = "";
+    if (lockBtn) lockBtn.disabled = true;
+  }
+
+  async function runCrnOcr(blob) {
+    if (crnResults) {
+      crnResults.innerHTML = `<div class="text-slate-500">Scanning for CRNs…</div>`;
+    }
+    if (lockBtn) lockBtn.disabled = true;
+
+    try {
+      const cells = await extractTableFromImage(blob, 5, 3);
+      detectedCrns = extractCrnsFromCells(cells);
+      renderCrnResults(detectedCrns, crnResults);
+
+      if (lockBtn) lockBtn.disabled = detectedCrns.length === 0;
+
+      console.log("[Optimizer] OCR cells:", cells);
+      console.log("[Optimizer] Detected CRNs:", detectedCrns);
+    } catch (err) {
+      console.error("[Optimizer OCR error]", err);
+      if (crnResults) {
+        crnResults.innerHTML = `<div class="text-red-600">OCR failed. Try a clearer screenshot.</div>`;
+      }
+      if (lockBtn) lockBtn.disabled = true;
+    }
+  }
+
+  function setPreviewFromBlob(blob, label) {
+    if (!blob || !blob.type || !blob.type.startsWith("image/")) {
+      showMessage("That doesn’t look like an image. Try again.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const src = e.target.result;
+      previewBox.innerHTML = `
+        <div class="relative w-full max-h-[420px] overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-50">
+          <img
+            src="${src}"
+            alt="${label || "Uploaded schedule"}"
+            class="block w-full h-full object-contain bg-slate-900/5"
+          />
+        </div>
+        <p class="mt-2 text-[0.7rem] text-slate-500 text-center">
+          ${label ? label + " · " : ""}Preview only – we&#39;ll use this to detect classes and times.
+        </p>
+      `;
+
+      runCrnOcr(blob);
+    };
+    reader.onerror = () =>
+      showMessage("We couldn’t read that image. Try again or use a different file.");
+    reader.readAsDataURL(blob);
+  }
+
+  function handleFiles(files, sourceLabel) {
+    if (!files || !files.length) return;
+    const file = files[0];
+    setPreviewFromBlob(file, sourceLabel);
+  }
+
+  // File input (click / pick)
+  fileInput.addEventListener("change", (e) => {
+    handleFiles(e.target.files, "Selected from device");
+  });
+
+  // Drag & drop
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+    dropzone.addEventListener(eventName, preventDefaults);
+  });
+
+  ["dragenter", "dragover"].forEach((eventName) => {
+    dropzone.addEventListener(eventName, () => {
+      dropzone.classList.add("ring-2", "ring-brand-400", "ring-offset-2");
+    });
+  });
+
+  ["dragleave", "drop"].forEach((eventName) => {
+    dropzone.addEventListener(eventName, () => {
+      dropzone.classList.remove("ring-2", "ring-brand-400", "ring-offset-2");
+    });
+  });
+
+  dropzone.addEventListener("drop", (e) => {
+    const dt = e.dataTransfer;
+    if (!dt || !dt.files || !dt.files.length) {
+      showMessage("No files found in drop. Try again or use the upload button.");
+      return;
+    }
+    handleFiles(dt.files, "Dropped from desktop");
+  });
+
+  // Clipboard paste button
+  pasteBtn.addEventListener("click", async () => {
+    if (!navigator.clipboard || !navigator.clipboard.read) {
+      showMessage("Clipboard image paste isn’t supported in this browser. Try Ctrl/Cmd + V instead.");
+      return;
+    }
+    try {
+      const items = await navigator.clipboard.read();
+      for (const item of items) {
+        for (const type of item.types) {
+          if (type.startsWith("image/")) {
+            const blob = await item.getType(type);
+            setPreviewFromBlob(blob, "Pasted from clipboard");
+            return;
+          }
+        }
+      }
+      showMessage("We didn’t find an image in your clipboard. Copy a screenshot first and then try again.");
+    } catch (err) {
+      console.error("Clipboard read failed", err);
+      showMessage("We couldn’t read from your clipboard. Try using the upload button instead.");
+    }
+  });
+
+  // Global paste handler
+  document.addEventListener("paste", (e) => {
+    const cd = e.clipboardData;
+    if (!cd) return;
+    const items = cd.items || [];
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.kind === "file" && item.type && item.type.startsWith("image/")) {
+        const file = item.getAsFile();
+        if (file) {
+          setPreviewFromBlob(file, "Pasted from clipboard");
+          e.preventDefault();
+        }
+        break;
+      }
+    }
+  });
+
+  // Lock & Analyze
+  if (lockBtn) {
+    lockBtn.addEventListener("click", () => {
+  if (!detectedCrns.length) return;
+  const fn = window.analyzeLockedSchedule || (typeof analyzeLockedSchedule === "function" ? analyzeLockedSchedule : null);
+  if (typeof fn !== "function") {
+    console.warn("[Optimizer] analyzeLockedSchedule not available yet.");
+    const holder = document.getElementById("optimizerRecommendations");
+    if (holder) holder.innerHTML = `<div class="text-red-600 text-xs">Analyzer not ready. Reload and try again.</div>`;
+    return;
+  }
+  fn(detectedCrns);
+});
+  }
+}
+
+
+    // === AI Chat Assistant (Builder & Optimizer wrapper) ===
+    const aiChatState = {
+      mode: null, // "build" | "optimize"
+      step: "askMode",
+      data: {
+        courses: [],
+        crns: []
+      }
+    };
+
+    async function aiChatParseAdvisementPdf(file) {
+      const { courses, sectionText } = await extractCoursesFromPdfFile(file, {
+        pdfjs: pdfjsLib,
+        startMarker: "Part 2: Desired Course Selection",
+        endMarker: "Part 2A",
+      });
+      const parsed = (courses || []).map(parseCourseLineToObject).filter(Boolean);
+
+      // Keep builder state in sync so the regular Schedule Builder panel can reuse it
+      if (typeof builderDetectedCoursesRaw !== "undefined") {
+        builderDetectedCoursesRaw = courses || [];
+      }
+      if (typeof builderParsedCourses !== "undefined") {
+        builderParsedCourses = parsed || [];
+      }
+
+      return { courses: courses || [], parsed, sectionText };
+    }
+
+    async function aiChatGenerateSchedulesFromParsedCourses() {
+      try {
+        if (typeof loadData === "function") {
+          await loadData();
+        }
+
+        if (!builderParsedCourses || !builderParsedCourses.length) {
+          return null;
+        }
+
+        const namedCourses = builderParsedCourses.filter(
+          (c) => c.type === "named" && c.courseKey
+        );
+        const placeholders = builderParsedCourses.filter(
+          (c) => c.type === "placeholder" || !c.courseKey
+        );
+
+        if (!namedCourses.length) {
+          return { courseEntries: [], chosen: [], placeholders };
+        }
+
+        const courseEntries = [];
+        namedCourses.forEach((course) => {
+          const sectionsForCourse = sectionsByCourseKey.get(course.courseKey) || [];
+          if (!sectionsForCourse.length) return;
+
+          const scored = sectionsForCourse.map((sec) => {
+            const score = scoreSectionOverall(sec);
+            return { section: sec, score };
+          });
+
+          scored.sort((a, b) => b.score.total - a.score.total);
+
+          courseEntries.push({
+            course,
+            candidates: scored.slice(0, 8),
+          });
+        });
+
+        if (!courseEntries.length) {
+          return { courseEntries: [], chosen: [], placeholders };
+        }
+
+        const chosen = buildGreedySchedule(courseEntries);
+        // Render into the regular Schedule Builder results container
+        renderScheduleOptions({ courseEntries, chosen, placeholders });
+
+        return { courseEntries, chosen, placeholders };
+      } catch (err) {
+        console.error("[AI Chat] schedule generation failed", err);
+        return null;
+      }
+    }
+
+    async function aiChatExtractCrnsFromImage(blob) {
+      const cells = await extractTableFromImage(blob);
+      const crns = extractCrnsFromCells(cells);
+      return crns || [];
+    }
+
+    function initAiChat() {
+      const messagesEl = document.getElementById("aiChatMessages");
+      const inputEl = document.getElementById("aiChatInput");
+      const sendBtn = document.getElementById("aiChatSendBtn");
+      const chipsEl = document.getElementById("aiChatChips");
+      const uploadBtn = document.getElementById("aiChatUploadBtn");
+      const fileInput = document.getElementById("aiChatFileInput");
+
+      if (!messagesEl || !inputEl || !sendBtn || !chipsEl || !uploadBtn || !fileInput) {
+        return;
+      }
+
+      
+      
+      // Unified AI Chat message system
+      const aiChatMessages = [];
+
+      function renderMessageInner(msg) {
+        const frag = document.createDocumentFragment();
+
+        // Text or HTML content
+        if (msg.type === "text" || msg.type === "choices") {
+          if (msg.html) {
+            const div = document.createElement("div");
+            div.className = "text-[0.85rem] leading-relaxed whitespace-pre-wrap";
+            div.innerHTML = msg.html;
+            frag.appendChild(div);
+          } else if (msg.text) {
+            const p = document.createElement("p");
+            p.className = "text-[0.85rem] leading-relaxed whitespace-pre-wrap";
+            p.textContent = msg.text;
+            frag.appendChild(p);
+          }
+        } else if (msg.type === "cardsHtml") {
+          const div = document.createElement("div");
+          div.className = "space-y-3 text-[0.85rem] leading-relaxed";
+          div.innerHTML = msg.html || "";
+          frag.appendChild(div);
+        } else if (msg.type === "file") {
+          const label = document.createElement("p");
+          label.className = "text-[0.75rem] uppercase tracking-wide text-slate-500 dark:text-slate-400";
+          label.textContent = msg.text || "File uploaded";
+          frag.appendChild(label);
+
+          if (msg.file && msg.file.kind === "image") {
+            const img = document.createElement("img");
+            img.src = msg.file.url;
+            img.alt = msg.file.name || "Uploaded image";
+            img.className =
+              "mt-1 max-h-56 w-auto rounded-xl border border-slate-200/70 dark:border-slate-700/70 object-contain";
+            frag.appendChild(img);
+          } else if (msg.file) {
+            const box = document.createElement("div");
+            box.className =
+              "mt-1 flex items-center gap-2 rounded-xl border border-slate-200/70 dark:border-slate-700/70 " +
+              "bg-slate-50/80 dark:bg-slate-900/50 px-3 py-2";
+            const name = document.createElement("div");
+            name.className = "text-[0.8rem]";
+            name.textContent = msg.file.name || "Uploaded file";
+            box.appendChild(name);
+            frag.appendChild(box);
+          }
+        }
+
+        // Actions / buttons (for choices & similar)
+        const actions = msg.actions || [];
+        if (actions.length) {
+          const row = document.createElement("div");
+          row.className = "mt-2 flex flex-wrap gap-2";
+
+          actions.forEach((action) => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            const variant = action.variant || "pill";
+
+            if (variant === "tile") {
+              btn.className =
+                "flex-1 min-w-[220px] max-w-sm flex items-center justify-between gap-3 " +
+                "rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm " +
+                "hover:border-sky-400 hover:shadow-md transition text-[0.8rem]";
+            } else {
+              btn.className =
+                "inline-flex items-center gap-2 rounded-full border border-sky-500/70 " +
+                "bg-sky-50/80 text-[0.75rem] font-medium text-sky-800 dark:text-sky-100 " +
+                "px-3 py-1.5 hover:bg-sky-100/80 dark:bg-sky-950/40 dark:border-sky-700/70";
+            }
+
+            btn.dataset.actionId = action.id || action.value;
+            if (action.icon) {
+              const iconSpan = document.createElement("span");
+              iconSpan.className = "inline-flex h-5 w-5 items-center justify-center rounded-full bg-sky-100 text-sky-700";
+              iconSpan.innerHTML = `<i class="${action.icon} text-[0.7rem]"></i>`;
+              btn.appendChild(iconSpan);
+            }
+            const span = document.createElement("span");
+            span.textContent = action.label || action.text || "";
+            btn.appendChild(span);
+
+            if (action.description && variant === "tile") {
+              const desc = document.createElement("span");
+              desc.className = "block text-[0.7rem] text-slate-500 text-left";
+              desc.textContent = action.description;
+              btn.appendChild(desc);
+            }
+
+            row.appendChild(btn);
+          });
+
+          frag.appendChild(row);
+        }
+
+        return frag;
+      }
+
+      function renderMessageCard(msg) {
+        const wrapper = document.createElement("div");
+        wrapper.className =
+          msg.role === "user"
+            ? "flex justify-end"
+            : "flex justify-start";
+
+        const card = document.createElement("div");
+        card.className =
+          "max-w-[90%] md:max-w-[75%] rounded-2xl border shadow-sm px-3 py-2 " +
+          (msg.role === "user"
+            ? "bg-sky-500 text-white border-sky-500"
+            : "bg-white/90 dark:bg-slate-900/80 text-slate-900 dark:text-slate-50 border-slate-200/70 dark:border-slate-700/70");
+
+        card.appendChild(renderMessageInner(msg));
+        wrapper.appendChild(card);
+        return wrapper;
+      }
+
+      function renderMessages() {
+        messagesEl.innerHTML = "";
+        aiChatMessages.forEach((msg) => {
+          messagesEl.appendChild(renderMessageCard(msg));
+        });
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+
+      function addMessage(msg) {
+        const full = {
+          id: `m_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+          role: msg.role || "assistant",
+          type: msg.type || "text",
+          text: msg.text || "",
+          html: msg.html || null,
+          actions: msg.actions || null,
+          file: msg.file || null,
+          meta: msg.meta || { timestamp: Date.now() },
+        };
+        aiChatMessages.push(full);
+        renderMessages();
+        return full;
+      }
+
+      function pushMessage(role, text, opts = {}) {
+        const isCards = opts && opts.variant === "cards" && role !== "user";
+        const msg = {
+          role,
+          type: isCards ? "cardsHtml" : "text",
+        };
+
+        if (opts && opts.html) {
+          msg.html = text;
+          msg.text = "";
+        } else {
+          msg.text = text;
+          msg.html = null;
+        }
+
+        addMessage(msg);
+      }
+
+      function pushAttachment(role, file, { label } = {}) {
+        if (!file) return;
+        const isImage = file.type && file.type.startsWith("image/");
+        const blobUrl = URL.createObjectURL(file);
+        addMessage({
+          role,
+          type: "file",
+          text: label || "File uploaded",
+          file: {
+            kind: isImage ? "image" : "file",
+            name: file.name,
+            url: blobUrl,
+          },
+        });
+      }
+
+      function setChips(chips) {
+        const list = chips || [];
+        if (!list.length) {
+          return;
+        }
+
+        const actions = list.map((chip) => ({
+          id: chip.value,
+          value: chip.value,
+          label: chip.label,
+          icon: chip.icon || null,
+          variant: chip.variant || "pill",
+          description: chip.description || null,
+        }));
+
+        // Attach actions to the last assistant message if possible
+        let target = null;
+        for (let i = aiChatMessages.length - 1; i >= 0; i--) {
+          const msg = aiChatMessages[i];
+          if (msg.role === "assistant") {
+            target = msg;
+            break;
+          }
+        }
+
+        if (target && (target.type === "text" || target.type === "cardsHtml") && !target.actions) {
+          target.type = "choices";
+          target.actions = actions;
+        } else {
+          aiChatMessages.push({
+            id: `m_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+            role: "assistant",
+            type: "choices",
+            text: "",
+            html: null,
+            actions,
+            file: null,
+            meta: { timestamp: Date.now() },
+          });
+        }
+
+        renderMessages();
+      }
+
+function resetState() {
+        aiChatState.mode = null;
+        aiChatState.step = "askMode";
+        aiChatState.data = { courses: [], crns: [] };
+      }
+
+      function summarizeWindowByDay(windowByDay) {
+        if (!windowByDay || !Object.keys(windowByDay).length) return "";
+        const dayOrder = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+        const parts = [];
+        dayOrder.forEach((d) => {
+          const w = windowByDay[d];
+          if (!w) return;
+          if (typeof minutesToDisplay === "function") {
+            parts.push(`${d} ${minutesToDisplay(w.startMin)}–${minutesToDisplay(w.endMin)}`);
+          } else {
+            parts.push(d);
+          }
+        });
+        return parts.join(", ");
+      }
+
+      function setTimePrefsFromPreset(preset) {
+        try {
+          if (typeof timePrefsModel === "undefined") return;
+          let days;
+          let start;
+          let end;
+          if (preset === "standard") {
+            days = ["Mon","Tue","Wed","Thu"];
+            start = 9 * 60;
+            end = 16 * 60;
+          } else if (preset === "morning") {
+            days = ["Mon","Tue","Wed","Thu","Fri"];
+            start = 8 * 60;
+            end = 13 * 60;
+          } else if (preset === "evening") {
+            days = ["Mon","Tue","Wed","Thu"];
+            start = 12 * 60;
+            end = 21 * 60;
+          } else {
+            return;
+          }
+
+          if (typeof setSelectedDays === "function") {
+            setSelectedDays(days);
+          } else {
+            timePrefsModel.selectedDays = new Set(days);
+          }
+
+          if (typeof setDefaultWindow === "function") {
+            setDefaultWindow(start, end);
+          } else {
+            timePrefsModel.defaultWindow = { start, end };
+          }
+
+          // Clear any per-day overrides so the preset is clean
+          if (timePrefsModel.dayOverrides) {
+            timePrefsModel.dayOverrides = {};
+          }
+
+          if (typeof syncDayButtons === "function") {
+            syncDayButtons();
+          }
+          if (typeof syncCustomRows === "function") {
+            syncCustomRows();
+          }
+          if (typeof renderTimeGrid === "function") {
+            renderTimeGrid();
+          }
+        } catch (e) {
+          console.error("[AI Chat] Failed to apply time preset", e);
+        }
+      }
+
+      function askForTimePrefsForBuild() {
+        pushMessage(
+          "assistant",
+          "Before I build schedules, choose what times you prefer for classes."
+        );
+        setChips([
+          { label: "Standard daytime (9am–4pm, Mon–Thu)", value: "time_build_standard" },
+          { label: "Morning‑heavy (8am–1pm, Mon–Fri)", value: "time_build_morning" },
+          { label: "Afternoons / evenings (12pm–9pm, Mon–Thu)", value: "time_build_evening" },
+          { label: "Use my existing builder settings", value: "time_build_existing" }
+        ]);
+      }
+
+      function askForTimePrefsForOptimize() {
+        const crns = aiChatState.data.crns || [];
+        let summary = "";
+        try {
+          if (
+            typeof getRegisteredSectionsFromCrns === "function" &&
+            typeof inferTimeWindow === "function" &&
+            crns.length
+          ) {
+            const registered = getRegisteredSectionsFromCrns(crns);
+            const windowByDay = inferTimeWindow(registered);
+            const human = summarizeWindowByDay(windowByDay);
+            if (human) {
+              summary = `Based on your current classes, your main time window looks like: ${human}.`;
+            }
+          }
+        } catch (e) {
+          console.warn("[AI Chat] Could not summarize optimizer window", e);
+        }
+        if (!summary) {
+          summary =
+            "I can infer a time window from your current classes and use that when suggesting swaps.";
+        }
+        pushMessage(
+          "assistant",
+          summary +
+            "\n\nDoes that general time pattern look okay for finding swaps, or should I just analyze without worrying about it?"
+        );
+        setChips([
+          { label: "That looks fine", value: "opt_window_ok" },
+          { label: "Just analyze my schedule", value: "opt_window_skip" }
+        ]);
+      }
+
+      function askForMode() {
+        resetState();
+        pushMessage(
+          "assistant",
+          "Hey! I can either help you **build a new schedule** from your advisement sheet or **optimize a schedule you already have**.\n\nWhat would you like to do?",
+          { html: true }
+        );
+        setChips([
+          {
+            label: "Build a schedule",
+            value: "mode_build",
+            variant: "tile",
+            icon: "fa-regular fa-calendar-plus"
+          },
+          {
+            label: "Optimize existing schedule",
+            value: "mode_optimize",
+            variant: "tile",
+            icon: "fa-regular fa-wand-magic-sparkles"
+          },
+        ]);
+      }
+
+      function askForPdf() {
+        pushMessage(
+          "assistant",
+          "Great — to build a schedule, please upload your **Advisement Sheet PDF**. Your file stays in your browser."
+        );
+        setChips([]);
+      }
+
+      function askForImage() {
+        pushMessage(
+          "assistant",
+          "Got it — to optimize your current schedule, upload or paste a **screenshot of your schedule** (with CRNs visible)."
+        );
+        setChips([]);
+      }
+
+      async function handleFile(file) {
+        if (!file) return;
+
+        if (aiChatState.mode === "build" && aiChatState.step === "awaitPdf") {
+          if (file.type !== "application/pdf") {
+            pushMessage("assistant", "That doesn’t look like a PDF. Try uploading your advisement sheet as a PDF.");
+            return;
+          }
+          pushAttachment("user", file, { label: "Uploaded advisement sheet" });
+          pushMessage("assistant", "Nice, let me read your advisement sheet and pull out the courses…");
+
+          try {
+            const result = await aiChatParseAdvisementPdf(file);
+            aiChatState.data.courses = result.courses;
+
+            if (!result.courses.length) {
+              pushMessage(
+                "assistant",
+                "I couldn’t detect any numbered courses in the “Part 2: Desired Course Selection” section. Double‑check that this is the right advisement form."
+              );
+              return;
+            }
+
+            const previewList =
+              result.courses.length > 8
+                ? result.courses.slice(0, 8).join(", ") + `, and ${result.courses.length - 8} more…`
+                : result.courses.join(", ");
+
+            pushMessage(
+              "assistant",
+              `Here’s what I found:\n\n${previewList}\n\nDoes that look right, or do you want to edit the course list?`
+            );
+            aiChatState.step = "confirmCourses";
+            setChips([
+              { label: "Looks good", value: "courses_ok" },
+              { label: "Edit courses", value: "courses_edit" },
+            ]);
+          } catch (err) {
+            console.error("[AI Chat] PDF parse error", err);
+            pushMessage(
+              "assistant",
+              "Something went wrong while reading that PDF. Try again with the same file, or a clearer scan if you have one."
+            );
+          }
+        } else if (aiChatState.mode === "optimize" && aiChatState.step === "awaitImage") {
+          if (!file.type.startsWith("image/")) {
+            pushMessage("assistant", "That doesn’t look like an image. Try uploading a screenshot instead.");
+            return;
+          }
+          pushAttachment("user", file, { label: "Uploaded screenshot" });
+          pushMessage("assistant", "Nice, I’ll scan the screenshot and look for CRNs…");
+
+          try {
+            const crns = await aiChatExtractCrnsFromImage(file);
+            aiChatState.data.crns = crns;
+
+            if (!crns.length) {
+              pushMessage(
+                "assistant",
+                "I couldn’t detect any CRNs in that screenshot. Try a clearer screenshot where the CRN column is fully visible."
+              );
+              return;
+            }
+
+            pushMessage(
+              "assistant",
+              `I detected these CRNs:\n\n${crns.join(", ")}\n\nDo you want me to analyze this schedule?`
+            );
+            aiChatState.step = "confirmCrns";
+            setChips([
+              { label: "Yes, analyze it", value: "crns_ok" },
+              { label: "No, I’ll edit the CRNs", value: "crns_edit" },
+            ]);
+          } catch (err) {
+            console.error("[AI Chat] image parse error", err);
+            pushMessage(
+              "assistant",
+              "Something went wrong while reading that screenshot. Try again with a different image."
+            );
+          }
+        }
+      }
+
+      async function runScheduleGeneration() {
+        pushMessage(
+          "assistant",
+          "Awesome — I’ll generate a schedule using those courses and our current time‑window settings."
+        );
+        const result = await aiChatGenerateSchedulesFromParsedCourses();
+
+        if (!result || !result.chosen || !result.chosen.length) {
+          pushMessage(
+            "assistant",
+            "I couldn’t build a full schedule that fits the current constraints. You can tweak time windows in the **Schedule Builder** tab and try again."
+          );
+        } else {
+          
+  
+  // Build a compact, contained card layout for chat (nested within one response block)
+  const htmlParts = [];
+  htmlParts.push(`
+    <div class="bg-slate-50/90 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 md:p-4 space-y-3 w-full">
+      <div class="text-sm md:text-base font-semibold text-slate-900 dark:text-slate-50">
+        Here’s one schedule option I put together for you:
+      </div>
+      <div class="space-y-2">
+  `);
+
+  result.chosen.forEach((sec) => {
+    const courseLabel =
+      (sec.subjectAbbrev ? sec.subjectAbbrev + " " : "") +
+      (sec.courseNumber || "");
+    const title = `${courseLabel}${sec.crn ? ` (${sec.crn})` : ""}`;
+    const when =
+      (sec.meetingDays || "TBA") +
+      (sec.meetingTime ? " • " + sec.meetingTime : "");
+    const prof =
+      sec.professorName ||
+      sec.instructor ||
+      sec.primaryInstructor ||
+      sec.faculty ||
+      "TBA";
+    const modeOrCampus =
+      sec.deliveryModeLabel ||
+      sec.deliveryMode ||
+      sec.campus ||
+      sec.locationCampus ||
+      "";
+
+    const diff = sec.difficultyLabel || "Difficulty N/A";
+    const wl =
+      sec.wlChance && typeof sec.wlChance.percent === "number"
+        ? `${sec.wlChance.label} WL (${sec.wlChance.percent}%)`
+        : "No waitlist info";
+
+    const courseTitle = sec.courseTitle || sec.title || "";
+
+    htmlParts.push(`
+      <div class="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm">
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            ${courseTitle ? `<div class="text-[11px] md:text-xs text-slate-500 dark:text-slate-400 truncate">${courseTitle}</div>` : ``}
+            <div class="text-sm md:text-[0.95rem] font-semibold text-slate-900 dark:text-slate-50">${title}</div>
+          </div>
+          ${modeOrCampus ? `
+            <div class="shrink-0 text-[10px] md:text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
+              ${modeOrCampus}
+            </div>` : ``}
+        </div>
+
+        <div class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[12px] md:text-sm text-slate-700 dark:text-slate-200">
+          <span class="inline-flex items-center gap-1">
+            <i class="fa-regular fa-clock opacity-70"></i>
+            <span>${when}</span>
+          </span>
+          ${prof && prof !== "TBA" ? `
+            <span class="inline-flex items-center gap-1">
+              <i class="fa-regular fa-user opacity-70"></i>
+              <span>${prof}</span>
+            </span>` : ``}
+        </div>
+
+        <div class="mt-2 flex flex-wrap gap-1.5">
+          <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] md:text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200">
+            ${diff}
+          </span>
+          <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] md:text-[11px] font-semibold bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-200">
+            ${wl}
+          </span>
+        </div>
+      </div>
+    `);
+  });
+
+  htmlParts.push(`
+      </div>
+      <div class="text-[12px] md:text-sm text-slate-600 dark:text-slate-300 pt-1">
+        For a full visual breakdown (including backup sections), scroll to the <b>Schedule Builder</b> section below.
+      </div>
+    </div>
+  `);
+
+  pushMessage("assistant", htmlParts.join(""), { html: true, variant: "cards" });
+}
+
+        aiChatState.step = "done";
+        setChips([
+          { label: "Start over", value: "restart" },
+          { label: "Switch to Optimize", value: "switch_optimize" },
+        ]);
+      }
+
+      
+      async function runCrnAnalysis() {
+        const crns = aiChatState.data.crns || [];
+        if (!crns.length) return;
+
+        pushMessage(
+          "assistant",
+          "Got it — I’ll run those CRNs through the optimizer and look for easier or safer swaps."
+        );
+
+        try {
+          const fn =
+            window.analyzeLockedSchedule ||
+            (typeof analyzeLockedSchedule === "function" ? analyzeLockedSchedule : null);
+          if (typeof fn !== "function") throw new Error("Analyzer not available");
+
+          const analysis = await fn(crns);
+          const summary = analysis?.summary;
+          const results = analysis?.results || [];
+
+          // 1) quick summary
+          if (summary) {
+            const wlSummary = Object.entries(summary.wlCounts || {})
+              .map(([k,v]) => `${k}: ${v}`)
+              .join(", ");
+
+            pushMessage(
+              "assistant",
+              `Done! Here’s a quick read:
+` +
+              `• Overall difficulty: ${summary.avgDiffLabel}` +
+              (summary.avgDiffPercent != null ? ` (~${Math.round(summary.avgDiffPercent)}%)` : "") + `
+` +
+              `• Waitlist risk mix: ${wlSummary || "Unknown"}
+` +
+              `• Swap ideas found: ${summary.swapCounts.available} open-seat, ${summary.swapCounts.waitlist} high‑chance WL swaps.`
+            );
+          } else {
+            pushMessage(
+              "assistant",
+              "Done! I analyzed that schedule."
+            );
+          }
+
+          
+// 2) show top swap options in chat (styled like Course Search)
+if (results.length) {
+  const htmlParts = [];
+  htmlParts.push(`
+    <div class="bg-slate-50/90 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 md:p-4 space-y-3 w-full">
+      <div class="text-sm md:text-base font-semibold text-slate-900 dark:text-slate-50">
+        Here are the top swap ideas I found (up to 2 per course):
+      </div>
+      <div class="space-y-3">
+  `);
+
+  const miniSecCard = (s, opts = {}) => {
+    if (!s) return "";
+    const courseLabel =
+      (s.subjectAbbrev ? s.subjectAbbrev + " " : "") +
+      (s.courseNumber || "");
+    const title = `${courseLabel}${s.crn ? ` (${s.crn})` : ""}`;
+    const when =
+      (s.meetingDays || "TBA") +
+      (s.meetingTime ? " • " + s.meetingTime : "");
+    const prof =
+      s.professorName ||
+      s.instructor ||
+      s.primaryInstructor ||
+      s.faculty ||
+      "TBA";
+    const modeOrCampus =
+      s.deliveryModeLabel ||
+      s.deliveryMode ||
+      s.campus ||
+      s.locationCampus ||
+      "";
+
+    const diff = s.difficultyLabel || "Difficulty N/A";
+    const wl =
+      s.wlChance && typeof s.wlChance.percent === "number"
+        ? `${s.wlChance.label} WL (${s.wlChance.percent}%)`
+        : "No waitlist info";
+    const seats =
+      (opts.kind === "available" && (s.seatsRem != null || s.seatsTot != null))
+        ? `Seats ${s.seatsRem ?? "?"}/${s.seatsTot ?? "?"}`
+        : "";
+
+    const courseTitle = s.courseTitle || s.title || "";
+
+    return `
+      <div class="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm">
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            ${opts.label ? `<div class="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-0.5">${opts.label}</div>` : ``}
+            ${courseTitle ? `<div class="text-[11px] md:text-xs text-slate-500 dark:text-slate-400 truncate">${courseTitle}</div>` : ``}
+            <div class="text-sm md:text-[0.95rem] font-semibold text-slate-900 dark:text-slate-50">${title}</div>
+          </div>
+          ${modeOrCampus ? `
+            <div class="shrink-0 text-[10px] md:text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
+              ${modeOrCampus}
+            </div>` : ``}
+        </div>
+
+        <div class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[12px] md:text-sm text-slate-700 dark:text-slate-200">
+          <span class="inline-flex items-center gap-1">
+            <i class="fa-regular fa-clock opacity-70"></i>
+            <span>${when}</span>
+          </span>
+          ${prof && prof !== "TBA" ? `
+            <span class="inline-flex items-center gap-1">
+              <i class="fa-regular fa-user opacity-70"></i>
+              <span>${prof}</span>
+            </span>` : ``}
+        </div>
+
+        <div class="mt-2 flex flex-wrap gap-1.5">
+          <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] md:text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200">
+            ${diff}
+          </span>
+          <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] md:text-[11px] font-semibold bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-200">
+            ${wl}
+          </span>
+          ${seats ? `
+            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] md:text-[11px] font-semibold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+              ${seats}
+            </span>` : ``}
+        </div>
+      </div>
+    `;
+  };
+
+  results.forEach((r) => {
+    const cur = r.current || {};
+    const curTitle = cur.courseKey || `${cur.subject || ""} ${cur.courseNumber || ""}`.trim() || "Course";
+    const avail = (r.available || []).slice(0, 2);
+    const wl = (r.waitlist || []).slice(0, 2);
+
+    htmlParts.push(`
+      <div class="space-y-2 border border-slate-200 dark:border-slate-700 rounded-2xl p-2 md:p-3 bg-slate-50/70 dark:bg-slate-900/40">
+        <div class="text-xs font-semibold text-slate-700 dark:text-slate-200">
+          ${curTitle}
+        </div>
+        ${miniSecCard(cur, { label: "Current section" })}
+        ${avail.length ? `
+          <div class="text-[11px] font-semibold text-emerald-700 dark:text-emerald-200 mt-1">Open-seat swaps</div>
+          <div class="space-y-2">
+            ${avail.map((s) => miniSecCard(s, { kind: "available" })).join("")}
+          </div>
+        ` : ``}
+        ${wl.length ? `
+          <div class="text-[11px] font-semibold text-sky-700 dark:text-sky-200 mt-1">Waitlist swaps</div>
+          <div class="space-y-2">
+            ${wl.map((s) => miniSecCard(s)).join("")}
+          </div>
+        ` : ``}
+        ${(!avail.length && !wl.length) ? `
+          <div class="text-[12px] text-slate-600 dark:text-slate-300">No better swaps found right now.</div>
+        ` : ``}
+      </div>
+    `);
+  });
+
+  htmlParts.push(`
+      </div>
+      <div class="text-[12px] md:text-sm text-slate-600 dark:text-slate-300 pt-1">
+        I also filled the full detailed list in the <b>Schedule Optimizer</b> tab if you want to browse everything.
+      </div>
+    </div>
+  `);
+
+  pushMessage("assistant", htmlParts.join(""), { html: true, variant: "cards" });
+}
+ else {
+            pushMessage(
+              "assistant",
+              "I couldn’t match those CRNs to registered sections, so no swap options to show yet."
+            );
+          }
+
+        } catch (err) {
+          console.error("[AI Chat] CRN analysis error", err);
+          pushMessage(
+            "assistant",
+            "Something went wrong while running the optimizer. Try another screenshot, or use the Schedule Optimizer tab directly."
+          );
+        }
+
+        aiChatState.step = "done";
+        setChips([
+          { label: "Start over", value: "restart" },
+          { label: "Switch to Build", value: "switch_build" },
+        ]);
+      }
+function handleChip(value) {
+        if (value === "restart") {
+          askForMode();
+          return;
+        }
+        if (value === "switch_build") {
+          aiChatState.mode = "build";
+          aiChatState.step = "awaitPdf";
+          pushMessage("user", "Let’s build a schedule instead.");
+          askForPdf();
+          return;
+        }
+        if (value === "switch_optimize") {
+          aiChatState.mode = "optimize";
+          aiChatState.step = "awaitImage";
+          pushMessage("user", "Let’s optimize my existing schedule instead.");
+          askForImage();
+          return;
+        }
+
+        if (aiChatState.step === "askMode") {
+          if (value === "mode_build") {
+            aiChatState.mode = "build";
+            aiChatState.step = "awaitPdf";
+            pushMessage("user", "I want to build a schedule.");
+            askForPdf();
+          } else if (value === "mode_optimize") {
+            aiChatState.mode = "optimize";
+            aiChatState.step = "awaitImage";
+            pushMessage("user", "I want to optimize my current schedule.");
+            askForImage();
+          }
+        } else if (aiChatState.step === "confirmCourses") {
+          if (value === "courses_ok") {
+            aiChatState.step = "awaitTimePrefsBuild";
+            askForTimePrefsForBuild();
+          } else if (value === "courses_edit") {
+            pushMessage(
+              "assistant",
+              "No problem — send me a list of courses you want to use instead (for example: `ACC 2320, MTH 1100C, ENG 1100C`)."
+            );
+            aiChatState.step = "editCourses";
+            setChips([]);
+          }
+        } else if (aiChatState.step === "awaitTimePrefsBuild") {
+          if (value === "time_build_standard") {
+            setTimePrefsFromPreset("standard");
+            pushMessage(
+              "assistant",
+              "Got it — I’ll use a standard daytime window (9am–4pm, Mon–Thu) when building schedules."
+            );
+            aiChatState.step = "generatedSchedule";
+            runScheduleGeneration();
+          } else if (value === "time_build_morning") {
+            setTimePrefsFromPreset("morning");
+            pushMessage(
+              "assistant",
+              "Got it — I’ll aim for morning‑heavy classes (around 8am–1pm, Mon–Fri)."
+            );
+            aiChatState.step = "generatedSchedule";
+            runScheduleGeneration();
+          } else if (value === "time_build_evening") {
+            setTimePrefsFromPreset("evening");
+            pushMessage(
+              "assistant",
+              "Got it — I’ll aim for afternoon / evening classes (around 12pm–9pm, Mon–Thu)."
+            );
+            aiChatState.step = "generatedSchedule";
+            runScheduleGeneration();
+          } else if (value === "time_build_existing") {
+            pushMessage(
+              "assistant",
+              "Okay — I’ll use whatever time settings you’ve already chosen in the Schedule Builder."
+            );
+            aiChatState.step = "generatedSchedule";
+            runScheduleGeneration();
+          }
+        } else if (aiChatState.step === "confirmCrns") {
+          if (value === "crns_ok") {
+            aiChatState.step = "confirmOptimizeWindow";
+            askForTimePrefsForOptimize();
+          } else if (value === "crns_edit") {
+            pushMessage(
+              "assistant",
+              "Okay — send me the CRNs you actually registered for (for example: `12345, 67890, 11223`)."
+            );
+            aiChatState.step = "editCrns";
+            setChips([]);
+          }
+        } else if (aiChatState.step === "confirmOptimizeWindow") {
+          if (value === "opt_window_ok" || value === "opt_window_skip") {
+            // We don’t change the underlying optimizer logic here — it already
+            // infers a time window from your CRNs. This step is just to surface
+            // that to the user in the chat flow.
+            runCrnAnalysis();
+          }
+        }
+      }
+
+      function handleUserText(text) {
+        if (!text) return;
+
+        if (aiChatState.step === "editCourses") {
+          const raw = text
+            .split(/[,;\n]/)
+            .map((t) => t.trim())
+            .filter(Boolean);
+
+          if (!raw.length) {
+            pushMessage(
+              "assistant",
+              "I didn’t see any course codes there. Try something like `ACC 2320, MTH 1100C, ENG 1100C`."
+            );
+            return;
+          }
+
+          aiChatState.data.courses = raw;
+          if (typeof builderDetectedCoursesRaw !== "undefined") {
+            builderDetectedCoursesRaw = raw;
+          }
+          if (typeof builderParsedCourses !== "undefined") {
+            builderParsedCourses = raw
+              .map((line) => parseCourseLineToObject(line))
+              .filter(Boolean);
+          }
+
+          pushMessage(
+            "assistant",
+            `Got it. I’ll use these courses:\n\n${raw.join(", ")}\n\nReady for me to generate a schedule with them?`
+          );
+          aiChatState.step = "confirmCourses";
+          setChips([
+            { label: "Yes, generate it", value: "courses_ok" },
+            { label: "Change them again", value: "courses_edit" },
+          ]);
+        } else if (aiChatState.step === "editCrns") {
+          const crns = text
+            .split(/[,;\s]+/)
+            .map((t) => t.trim())
+            .filter((t) => /^\d{4,6}$/.test(t));
+
+          if (!crns.length) {
+            pushMessage(
+              "assistant",
+              "I didn’t see any CRNs in that message. Try something like `12345, 67890, 11223`."
+            );
+            return;
+          }
+
+          aiChatState.data.crns = crns;
+          pushMessage(
+            "assistant",
+            `Perfect — I’ll use these CRNs: ${crns.join(", ")}. Want me to analyze this schedule?`
+          );
+          aiChatState.step = "confirmCrns";
+          setChips([
+            { label: "Yes, analyze it", value: "crns_ok" },
+            { label: "Change them again", value: "crns_edit" },
+          ]);
+        } else {
+          // Generic text while not in a special step
+          pushMessage(
+            "assistant",
+            "I’ll guide you using buttons and file uploads here. To restart, tap **Start over**."
+          );
+        }
+      }
+
+      sendBtn.addEventListener("click", () => {
+        const text = inputEl.value.trim();
+        if (!text) return;
+        pushMessage("user", text);
+        inputEl.value = "";
+        handleUserText(text);
+      });
+
+      inputEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          sendBtn.click();
+        }
+      });
+
+      uploadBtn.addEventListener("click", () => {
+        fileInput.click();
+      });
+
+      fileInput.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+          handleFile(file);
+        }
+        // Reset value so uploading the same file again still fires change
+        e.target.value = "";
+      });
+
+      
+      messagesEl.addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-action-id]");
+        if (!btn) return;
+        const actionId = btn.dataset.actionId;
+        if (typeof handleChip === "function") {
+          handleChip(actionId);
+        }
+      });
+
+// Start the conversation
+      askForMode();
+    }
+
+
 // kick off nav + time preferences + initial data load
     document.addEventListener("DOMContentLoaded", () => {
       initSpaNav();
       initTimePrefsUI();
       loadData();
+      initScheduleOptimizer();
+      initAiChat();
     });
   </script>
 </body>
