@@ -39,6 +39,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
@@ -122,6 +123,23 @@
     }
   }
 
+  /* Smooth enter animation for new AI assistant messages */
+  @keyframes aiMessageIn {
+    0% {
+      opacity: 0;
+      transform: translateY(6px) scale(0.99);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .ai-msg-enter {
+    animation: aiMessageIn 0.16s ease-out;
+    animation-fill-mode: both;
+  }
+
 </style>
 
   <!-- PDF.js for advisement sheet reading -->
@@ -168,9 +186,28 @@
     <!-- Mobile nav drawer -->
     <nav
       id="mobileNav"
-      class="lg:hidden hidden bg-slate-950 border-b border-slate-800/80 z-30"
+      class="lg:hidden fixed inset-0 z-40 bg-slate-950/95 backdrop-blur-sm border-b border-slate-800/80
+             transform -translate-y-full opacity-0 pointer-events-none
+             transition-transform transition-opacity duration-200 ease-out"
     >
-      <div class="px-3 py-2 space-y-1">
+      <div class="relative max-w-md mx-auto h-full flex flex-col">
+        <div class="flex items-center justify-between px-4 pt-4 pb-2">
+          <span class="text-xs font-medium tracking-wide text-slate-300 uppercase">
+            Menu
+          </span>
+          <button
+            id="mobileNavClose"
+            type="button"
+            class="inline-flex items-center justify-center rounded-full border border-slate-700/70
+                   bg-slate-900/80 p-2 text-slate-100 shadow-sm hover:bg-slate-800/80"
+          >
+            <i class="fa-solid fa-xmark text-sm"></i>
+            <span class="sr-only">Close menu</span>
+          </button>
+        </div>
+
+        <div class="px-4 pb-6 pt-2 space-y-1 overflow-y-auto">
+
         <a href="?page=home"
            data-nav="home"
            class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-white/5">
@@ -186,7 +223,7 @@
         <a href="?page=schedule-builder"
            data-nav="schedule-builder"
            class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-white/5">
-          <i class="fa-solid fa-calendar-plus text-xs opacity-75"></i>
+          <i class="fa-solid fa-table-list text-xs opacity-75"></i>
           <span>Schedule Builder</span>
         </a>
         <a href="?page=schedule-optimizer"
@@ -201,8 +238,10 @@
           <i class="fa-solid fa-comments text-xs opacity-75"></i>
           <span>AI Chat</span>
         </a>
-      </div>
-    </nav>
+
+        </div>
+      </div>    </nav>
+
     <aside class="hidden lg:flex w-64 flex flex-col border-r border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 h-screen">
       <div class="px-4 py-4 flex items-center gap-3 border-b border-slate-800/80">
         <div class="h-9 w-9 rounded-xl overflow-hidden ring-1 ring-slate-700/70 shadow-sm">
@@ -255,21 +294,8 @@
         </a>
       </nav>
 
-      <div class="px-3 pb-4 pt-2 border-t border-slate-800/80 space-y-2">
-        <button
-          id="themeToggle"
-          class="w-full inline-flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-slate-700/70 bg-slate-900/70 hover:bg-slate-800/80 text-xs text-slate-200 shadow-sm"
-        >
-          <span class="inline-flex items-center gap-2">
-            <span class="icon inline-flex h-6 w-6 items-center justify-center rounded-lg bg-slate-800/90 border border-slate-600/70">
-              <i class="fa-solid fa-moon text-slate-300 text-[0.75rem]"></i>
-            </span>
-            <span class="label">Dark</span>
-          </span>
-          <span class="text-[10px] uppercase tracking-wide text-slate-400">Theme</span>
-        </button>
-
-        <span class="inline-flex items-center justify-center w-full rounded-full bg-amber-500/10 px-3 py-1.5 text-[11px] font-medium text-amber-300 border border-amber-500/40">
+      <div class="px-3 pb-4 pt-2 border-t border-slate-800/80">
+        <span class="inline-flex items-center justify-center w-full rounded-lg bg-amber-500/10 text-[11px] font-medium text-amber-300 border border-amber-500/40">
           <span class="w-1.5 h-1.5 rounded-full bg-amber-400 mr-1.5"></span>
           Prototype
         </span>
@@ -1136,6 +1162,187 @@
 <script>
     // === Shared config & state ===
 
+
+
+const miniSecCard = (s, opts = {}) => {
+  if (!s) return "";
+
+  const isCompact = opts.compact === true;
+
+  // Basic identifiers
+  const courseLabel =
+    (s.subjectAbbrev ? s.subjectAbbrev + " " : "") +
+    (s.courseNumber || "");
+  const title = `${courseLabel}${s.crn ? ` (${s.crn})` : ""}`;
+  const courseTitle = s.courseTitle || s.title || courseLabel || "";
+
+  // Meeting info
+  const when =
+    (s.meetingDays || s.days || "TBA") +
+    (s.meetingTime || s.time ? " • " + (s.meetingTime || s.time) : "");
+
+  // Professor
+  const prof =
+    s.instructorDisplay ||
+    s.professorName ||
+    s.professor ||
+    s.instructor ||
+    s.primaryInstructor ||
+    s.faculty ||
+    "TBA";
+
+  // Location
+  const campus = s.campusName || s.campus || "";
+  const building = s.buildingName || s.building || "";
+  const room = s.room || s.roomNumber || "";
+  const locationParts = [campus, building, room].filter(Boolean);
+  const locationDisplay = locationParts.join(" · ");
+
+  // Difficulty badge
+  const diffLabel =
+    s.difficultyLabel || s.diffLabel || (s.difficulty && s.difficulty.label);
+  const diffPercent =
+    typeof s.difficultyPercent === "number"
+      ? Math.round(s.difficultyPercent)
+      : s.difficulty && typeof s.difficulty.percent === "number"
+      ? Math.round(s.difficulty.percent)
+      : null;
+  const diffClasses = diffLabel ? getDifficultyBadgeClasses(diffLabel) : "";
+  const diffText = diffLabel
+    ? `${diffLabel}${diffPercent != null ? ` · ${diffPercent}%` : ""}`
+    : null;
+
+  // Waitlist badge
+  const wlLabel =
+    (s.wlChance && s.wlChance.label) || s.waitlistLabel || s.wlLabel || "";
+  const wlPercent =
+    s.wlChance && typeof s.wlChance.percent === "number"
+      ? Math.round(s.wlChance.percent)
+      : null;
+  const wlClasses = wlLabel ? getWaitlistBadgeClasses(wlLabel) : "";
+  const wlText = wlLabel
+    ? `${wlLabel}${wlPercent != null ? ` · ${wlPercent}%` : ""}`
+    : null;
+
+  // Seats text
+  let seatsText = "";
+  if (s.seatsTot === 0 && s.isFull) {
+    seatsText = "Seats: not open";
+  } else if (s.seatsRem == null || s.seatsTot == null) {
+    seatsText = "Seats: n/a";
+  } else {
+    const filled = s.seatsTot - s.seatsRem;
+    seatsText = `Seats: ${filled}/${s.seatsTot} filled`;
+  }
+
+  // Optional label above card (e.g. "Locked", "New", index, etc.)
+  const labelTag = opts.label
+    ? `<div class="text-[0.7rem] font-semibold uppercase tracking-wide text-slate-500 mb-0.5">
+         ${opts.label}
+       </div>`
+    : "";
+
+  const outerClasses = isCompact
+    ? "rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm px-3 py-1.5 text-[0.78rem]"
+    : "rounded-2xl border border-slate-200/80 bg-white shadow-sm px-4 py-3 text-[0.85rem]";
+
+  const headerRowClasses = isCompact
+    ? "flex items-start justify-between gap-2"
+    : "flex items-center justify-between gap-2";
+
+  const subjectPillClasses = isCompact
+    ? "inline-flex items-center gap-1.5 rounded-full bg-slate-100 text-slate-700 px-2 py-0.5 text-[0.7rem] font-semibold tracking-wide uppercase"
+    : "inline-flex items-center gap-1.5 rounded-full bg-slate-100 text-slate-700 px-2.5 py-0.5 text-[0.7rem] font-semibold tracking-wide uppercase";
+
+  const diffPillClasses = isCompact
+    ? "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.7rem] font-medium"
+    : "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[0.75rem] font-medium";
+
+  const wlPillClasses = isCompact
+    ? "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.7rem] font-medium"
+    : "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[0.75rem] font-medium";
+
+  return `
+    <article class="${outerClasses}">
+      <div class="flex flex-col gap-2">
+        ${labelTag}
+
+        <div class="${headerRowClasses}">
+          <div class="flex items-center gap-2 flex-wrap min-w-0">
+            <span class="${subjectPillClasses}">
+              <span>${s.subjectDesc || s.subjectAbbrev || "Course"}</span>
+              ${
+                s.courseNumber
+                  ? `<span class="text-slate-400">·</span><span>${s.courseNumber}</span>`
+                  : ""
+              }
+            </span>
+            ${
+              s.crn
+                ? `<span class="text-[0.7rem] text-slate-400">CRN ${s.crn}</span>`
+                : ""
+            }
+          </div>
+
+          ${
+            diffText || wlText
+              ? `<div class="flex flex-wrap justify-end gap-1">
+                  ${
+                    diffText
+                      ? `<span class="${diffPillClasses} ${diffClasses}">${diffText}</span>`
+                      : ""
+                  }
+                  ${
+                    wlText
+                      ? `<span class="${wlPillClasses} ${wlClasses}">${wlText}</span>`
+                      : ""
+                  }
+                </div>`
+              : ""
+          }
+        </div>
+
+        <div class="font-semibold text-slate-900 truncate">
+          ${courseTitle || title}
+        </div>
+
+        <div class="flex flex-wrap gap-2 text-slate-500">
+          ${
+            when
+              ? `<div class="inline-flex items-center gap-1">
+                   <i class="fa-regular fa-calendar"></i>
+                   <span>${when}</span>
+                 </div>`
+              : ""
+          }
+          ${
+            locationDisplay
+              ? `<div class="inline-flex items-center gap-1">
+                   <i class="fa-solid fa-location-dot text-[0.7rem]"></i>
+                   <span>${locationDisplay}</span>
+                 </div>`
+              : ""
+          }
+        </div>
+
+        <div class="flex items-center justify-between text-slate-600">
+          <div class="inline-flex items-center gap-1 min-w-0">
+            <i class="fa-regular fa-user text-[0.7rem] text-slate-400"></i>
+            <span class="truncate">${prof}</span>
+          </div>
+          <div class="text-[0.7rem] text-slate-500">
+            ${seatsText}
+          </div>
+        </div>
+      </div>
+    </article>
+  `;
+};
+
+
+
+
+
     const SUBJECTS_API = "https://sheet2api.com/v1/ZPeTNTUrSFuL/all_subjects_spring_2026";
     const PROFS_API    = "https://sheet2api.com/v1/ZPeTNTUrSFuL/professor_ratings";
     const SUBJECT_ABBREV_API = "https://sheet2api.com/v1/ZPeTNTUrSFuL/subjects-abbreviations";
@@ -1147,8 +1354,7 @@
     const wlToggle        = document.getElementById("wlToggle");
     const statusText      = document.getElementById("statusText");
     const resultsContainer= document.getElementById("resultsContainer");
-    const themeToggle     = document.getElementById("themeToggle");
-    const clearDifficultyBtn = document.getElementById("clearDifficulty");
+const clearDifficultyBtn = document.getElementById("clearDifficulty");
 
     
     // SPA-style nav + deeplinks
@@ -1209,12 +1415,39 @@ document.body.classList.toggle("ai-chat-mode", isAiChat);
         setActivePage(page);
       });
 
-      // mobile nav toggle
+      // mobile nav toggle (animated full-screen drawer)
       const mobileNavToggle = document.getElementById("mobileNavToggle");
       const mobileNav = document.getElementById("mobileNav");
+      const mobileNavClose = document.getElementById("mobileNavClose");
       if (mobileNavToggle && mobileNav) {
         mobileNavToggle.addEventListener("click", () => {
-          mobileNav.classList.toggle("hidden");
+          const isOpen = mobileNav.classList.contains("translate-y-0");
+
+          if (!isOpen) {
+            // OPEN: slide in + fade in
+            mobileNav.classList.remove("-translate-y-full", "opacity-0", "pointer-events-none");
+            mobileNav.classList.add("translate-y-0", "opacity-100", "pointer-events-auto");
+          } else {
+            // CLOSE: slide out + fade out
+            mobileNav.classList.remove("translate-y-0", "opacity-100", "pointer-events-auto");
+            mobileNav.classList.add("-translate-y-full", "opacity-0", "pointer-events-none");
+          }
+        });
+
+
+        // Close nav when explicit close button is pressed
+        if (mobileNavClose) {
+          mobileNavClose.addEventListener("click", () => {
+            mobileNav.classList.remove("translate-y-0", "opacity-100", "pointer-events-auto");
+            mobileNav.classList.add("-translate-y-full", "opacity-0", "pointer-events-none");
+          });
+        }
+        // Close nav when a link is clicked
+        mobileNav.querySelectorAll("[data-nav]").forEach((link) => {
+          link.addEventListener("click", () => {
+            mobileNav.classList.remove("translate-y-0", "opacity-100", "pointer-events-auto");
+            mobileNav.classList.add("-translate-y-full", "opacity-0", "pointer-events-none");
+          });
         });
       }
     }
@@ -1238,28 +1471,7 @@ let activeDifficulty = "";
       return Math.max(0, Math.floor(diff));
     }
 
-    // Theme toggle
-    themeToggle.addEventListener("click", () => {
-      const body  = document.body;
-      const icon  = themeToggle.querySelector(".icon i");
-      const label = themeToggle.querySelector(".label");
-      const isDark = body.classList.toggle("bg-slate-900");
-      body.classList.toggle("text-slate-50", isDark);
-      body.classList.toggle("text-slate-900", !isDark);
-      body.classList.toggle("bg-gradient-to-b", !isDark);
-      if (isDark) {
-        themeToggle.classList.add("bg-slate-800", "border-slate-700", "text-slate-100");
-        icon.classList.remove("fa-moon");
-        icon.classList.add("fa-sun", "text-amber-300");
-        label.textContent = "Light";
-      } else {
-        themeToggle.classList.remove("bg-slate-800", "border-slate-700", "text-slate-100");
-        icon.classList.remove("fa-sun", "text-amber-300");
-        icon.classList.add("fa-moon", "text-slate-500");
-        label.textContent = "Dark";
-      }
-    });
-
+    
     // helpers
     function titleCase(str) {
       if (!str) return "";
@@ -3683,7 +3895,7 @@ window.analyzeLockedSchedule = analyzeLockedSchedule;
           }
         } else if (msg.type === "cardsHtml") {
           const div = document.createElement("div");
-          div.className = "space-y-3 text-[0.85rem] leading-relaxed";
+          div.className = "space-y-2 text-[0.85rem] leading-relaxed";
           div.innerHTML = msg.html || "";
           frag.appendChild(div);
         } else if (msg.type === "file") {
@@ -3783,11 +3995,34 @@ window.analyzeLockedSchedule = analyzeLockedSchedule;
       }
 
       function renderMessages() {
-        messagesEl.innerHTML = "";
-        aiChatMessages.forEach((msg) => {
-          messagesEl.appendChild(renderMessageCard(msg));
+        // Determine the index of the last assistant message so only that one animates
+        let lastAssistantIndex = -1;
+        aiChatMessages.forEach((msg, i) => {
+          if (msg.role === "assistant") lastAssistantIndex = i;
         });
-        messagesEl.scrollTop = messagesEl.scrollHeight;
+
+        messagesEl.innerHTML = "";
+        aiChatMessages.forEach((msg, index) => {
+          const el = renderMessageCard(msg);
+
+          // Apply a quick enter animation to the newest assistant message on each render
+          if (index === lastAssistantIndex && msg.role === "assistant") {
+            el.classList.add("ai-msg-enter");
+          }
+
+          messagesEl.appendChild(el);
+        });
+
+        // Auto-scroll the scrollable container (the element with .ai-chat-scroll)
+        const scrollContainer = messagesEl.closest('.ai-chat-scroll');
+        if (scrollContainer) {
+          const target = scrollContainer.scrollHeight;
+          if (scrollContainer.scrollTo) {
+            scrollContainer.scrollTo({ top: target, behavior: "smooth" });
+          } else {
+            scrollContainer.scrollTop = target;
+          }
+        }
       }
 
       function addMessage(msg) {
@@ -4144,77 +4379,17 @@ function resetState() {
   // Build a compact, contained card layout for chat (nested within one response block)
   const htmlParts = [];
   htmlParts.push(`
-    <div class="bg-slate-50/90 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 md:p-4 space-y-3 w-full">
-      <div class="text-sm md:text-base font-semibold text-slate-900 dark:text-slate-50">
+    <div class="rounded-2xl bg-white border border-slate-200/80 shadow-sm p-3 md:p-4 space-y-3 w-full">
+      <div class="text-sm md:text-base font-semibold text-slate-900">
         Here’s one schedule option I put together for you:
       </div>
-      <div class="space-y-2">
+      <div class="space-y-1">
   `);
 
-  result.chosen.forEach((sec) => {
-    const courseLabel =
-      (sec.subjectAbbrev ? sec.subjectAbbrev + " " : "") +
-      (sec.courseNumber || "");
-    const title = `${courseLabel}${sec.crn ? ` (${sec.crn})` : ""}`;
-    const when =
-      (sec.meetingDays || "TBA") +
-      (sec.meetingTime ? " • " + sec.meetingTime : "");
-    const prof =
-      sec.professorName ||
-      sec.instructor ||
-      sec.primaryInstructor ||
-      sec.faculty ||
-      "TBA";
-    const modeOrCampus =
-      sec.deliveryModeLabel ||
-      sec.deliveryMode ||
-      sec.campus ||
-      sec.locationCampus ||
-      "";
-
-    const diff = sec.difficultyLabel || "Difficulty N/A";
-    const wl =
-      sec.wlChance && typeof sec.wlChance.percent === "number"
-        ? `${sec.wlChance.label} WL (${sec.wlChance.percent}%)`
-        : "No waitlist info";
-
-    const courseTitle = sec.courseTitle || sec.title || "";
-
-    htmlParts.push(`
-      <div class="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm">
-        <div class="flex items-start justify-between gap-2">
-          <div class="min-w-0">
-            ${courseTitle ? `<div class="text-[11px] md:text-xs text-slate-500 dark:text-slate-400 truncate">${courseTitle}</div>` : ``}
-            <div class="text-sm md:text-[0.95rem] font-semibold text-slate-900 dark:text-slate-50">${title}</div>
-          </div>
-          ${modeOrCampus ? `
-            <div class="shrink-0 text-[10px] md:text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
-              ${modeOrCampus}
-            </div>` : ``}
-        </div>
-
-        <div class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[12px] md:text-sm text-slate-700 dark:text-slate-200">
-          <span class="inline-flex items-center gap-1">
-            <i class="fa-regular fa-clock opacity-70"></i>
-            <span>${when}</span>
-          </span>
-          ${prof && prof !== "TBA" ? `
-            <span class="inline-flex items-center gap-1">
-              <i class="fa-regular fa-user opacity-70"></i>
-              <span>${prof}</span>
-            </span>` : ``}
-        </div>
-
-        <div class="mt-2 flex flex-wrap gap-1.5">
-          <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] md:text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200">
-            ${diff}
-          </span>
-          <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] md:text-[11px] font-semibold bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-200">
-            ${wl}
-          </span>
-        </div>
-      </div>
-    `);
+  result.chosen.forEach((sec, idx) => {
+    htmlParts.push(
+      miniSecCard(sec, { compact: true })
+    );
   });
 
   htmlParts.push(`
@@ -4290,84 +4465,7 @@ if (results.length) {
       </div>
       <div class="space-y-3">
   `);
-
-  const miniSecCard = (s, opts = {}) => {
-    if (!s) return "";
-    const courseLabel =
-      (s.subjectAbbrev ? s.subjectAbbrev + " " : "") +
-      (s.courseNumber || "");
-    const title = `${courseLabel}${s.crn ? ` (${s.crn})` : ""}`;
-    const when =
-      (s.meetingDays || "TBA") +
-      (s.meetingTime ? " • " + s.meetingTime : "");
-    const prof =
-      s.professorName ||
-      s.instructor ||
-      s.primaryInstructor ||
-      s.faculty ||
-      "TBA";
-    const modeOrCampus =
-      s.deliveryModeLabel ||
-      s.deliveryMode ||
-      s.campus ||
-      s.locationCampus ||
-      "";
-
-    const diff = s.difficultyLabel || "Difficulty N/A";
-    const wl =
-      s.wlChance && typeof s.wlChance.percent === "number"
-        ? `${s.wlChance.label} WL (${s.wlChance.percent}%)`
-        : "No waitlist info";
-    const seats =
-      (opts.kind === "available" && (s.seatsRem != null || s.seatsTot != null))
-        ? `Seats ${s.seatsRem ?? "?"}/${s.seatsTot ?? "?"}`
-        : "";
-
-    const courseTitle = s.courseTitle || s.title || "";
-
-    return `
-      <div class="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm">
-        <div class="flex items-start justify-between gap-2">
-          <div class="min-w-0">
-            ${opts.label ? `<div class="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-0.5">${opts.label}</div>` : ``}
-            ${courseTitle ? `<div class="text-[11px] md:text-xs text-slate-500 dark:text-slate-400 truncate">${courseTitle}</div>` : ``}
-            <div class="text-sm md:text-[0.95rem] font-semibold text-slate-900 dark:text-slate-50">${title}</div>
-          </div>
-          ${modeOrCampus ? `
-            <div class="shrink-0 text-[10px] md:text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
-              ${modeOrCampus}
-            </div>` : ``}
-        </div>
-
-        <div class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[12px] md:text-sm text-slate-700 dark:text-slate-200">
-          <span class="inline-flex items-center gap-1">
-            <i class="fa-regular fa-clock opacity-70"></i>
-            <span>${when}</span>
-          </span>
-          ${prof && prof !== "TBA" ? `
-            <span class="inline-flex items-center gap-1">
-              <i class="fa-regular fa-user opacity-70"></i>
-              <span>${prof}</span>
-            </span>` : ``}
-        </div>
-
-        <div class="mt-2 flex flex-wrap gap-1.5">
-          <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] md:text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200">
-            ${diff}
-          </span>
-          <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] md:text-[11px] font-semibold bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-200">
-            ${wl}
-          </span>
-          ${seats ? `
-            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] md:text-[11px] font-semibold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
-              ${seats}
-            </span>` : ``}
-        </div>
-      </div>
-    `;
-  };
-
-  results.forEach((r) => {
+results.forEach((r) => {
     const cur = r.current || {};
     const curTitle = cur.courseKey || `${cur.subject || ""} ${cur.courseNumber || ""}`.trim() || "Course";
     const avail = (r.available || []).slice(0, 2);
@@ -4481,7 +4579,7 @@ function handleChip(value) {
               "Got it — I’ll use a standard daytime window (9am–4pm, Mon–Thu) when building schedules."
             );
             aiChatState.step = "generatedSchedule";
-            runScheduleGeneration();
+            setTimeout(() => { runScheduleGeneration(); }, 0);
           } else if (value === "time_build_morning") {
             setTimePrefsFromPreset("morning");
             pushMessage(
@@ -4489,7 +4587,7 @@ function handleChip(value) {
               "Got it — I’ll aim for morning‑heavy classes (around 8am–1pm, Mon–Fri)."
             );
             aiChatState.step = "generatedSchedule";
-            runScheduleGeneration();
+            setTimeout(() => { runScheduleGeneration(); }, 0);
           } else if (value === "time_build_evening") {
             setTimePrefsFromPreset("evening");
             pushMessage(
@@ -4497,7 +4595,7 @@ function handleChip(value) {
               "Got it — I’ll aim for afternoon / evening classes (around 12pm–9pm, Mon–Thu)."
             );
             aiChatState.step = "generatedSchedule";
-            runScheduleGeneration();
+            setTimeout(() => { runScheduleGeneration(); }, 0);
           } else if (value === "time_build_custom") {
             aiChatState.step = "awaitCustomTimeWindow";
             setChips([]);
@@ -4573,7 +4671,7 @@ function handleChip(value) {
               `Perfect — I’ll build schedules within **${formatMinutesToTime(start)}–${formatMinutesToTime(end)}**.`
             );
             aiChatState.step = "generatedSchedule";
-            runScheduleGeneration();
+            setTimeout(() => { runScheduleGeneration(); }, 0);
           }
 } else if (aiChatState.step === "confirmCrns") {
           if (value === "crns_ok") {
@@ -4592,7 +4690,7 @@ function handleChip(value) {
             // We don’t change the underlying optimizer logic here — it already
             // infers a time window from your CRNs. This step is just to surface
             // that to the user in the chat flow.
-            runCrnAnalysis();
+            setTimeout(() => { runCrnAnalysis(); }, 0);
           }
         }
       }
